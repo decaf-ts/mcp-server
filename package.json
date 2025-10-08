@@ -7,8 +7,11 @@
     "require": "./lib/index.cjs",
     "import": "./lib/esm/index.js"
   },
+  "main": "lib/decaf-mcp.cjs",
   "types": "lib/index.d.ts",
   "scripts": {
+    "start": "node dist/fastmcp-server.js",
+    "dev": "tsx watch fastmcp-server.ts",
     "do-install": "TOKEN=$(cat .token) npm install",
     "update-scripts": "node ./bin/update-scripts.cjs",
     "on-first-run": "node ./bin/update-scripts.cjs --boot",
@@ -79,12 +82,13 @@
     "typescript",
     "ts"
   ],
-  "author": "Tiago Venceslau",
+  "author": "Tiago Venceslau and Contributors",
   "bugs": {
     "url": "https://github.com/decaf-ts/ts-workspace/issues"
   },
   "homepage": "https://github.com/decaf-ts/ts-workspace#readme",
   "devDependencies": {
+    "@decaf-ts/utils": "latest",
     "@eslint/js": "^9.25.1",
     "@rollup/plugin-commonjs": "^28.0.3",
     "@rollup/plugin-json": "^6.1.0",
@@ -113,10 +117,20 @@
     "ts-jest": "^29.3.2",
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
+    "tsx": "^4.16.0",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.31.0"
   },
   "peerDependencies": {
-    "fastmcp": "^3.8.4"
-  }
+    "@decaf-ts/as-zod": "latest",
+    "@decaf-ts/cli": "latest",
+    "@decaf-ts/decoration": "latest",
+    "@decaf-ts/logging": "latest",
+    "fastmcp": "^3.19.0",
+    "ts-morph": "^21.0.0",
+    "typescript": "^5.6.3",
+    "diff": "^7.0.0",
+    "zod": "^3.25.76"
+  },
+  "license": "MIT"
 }
