@@ -12,7 +12,7 @@
   "scripts": {
     "start": "node dist/fastmcp-server.js",
     "dev": "tsx watch fastmcp-server.ts",
-    "do-install": "TOKEN=$(cat .token) npm install",
+    "do-install": "NPM_TOKEN=$(cat .npmtoken) npm install",
     "update-scripts": "node ./bin/update-scripts.cjs",
     "on-first-run": "node ./bin/update-scripts.cjs --boot",
     "set-git-auth": "git config url.\"https://api:$(cat .token)@github.com/\".insteadOf \"https://github.com/\" && git config url.\"https://ssh:$(cat .token)@github.com/\".insteadOf \"ssh://git@github.com/\" && git config url.\"https://git:$(cat .token)@github.com/\".insteadOf \"git@github.com:\"",
