@@ -120,6 +120,7 @@ const documentCodeTool: Tool<undefined, typeof documentCodeSchema> = {
   },
   description:
     "Generate documentation guidance for a file by combining repository prompts with the target source code.",
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   execute: async (input, _context): Promise<ContentResult> => {
     const args = documentCodeSchema.parse(input as DocumentCodeArgs);
     const root = getWorkspaceRoot();
@@ -178,6 +179,7 @@ const applyCodeChangeTool: Tool<undefined, typeof codeChangeSchema> = {
   },
   description:
     "Apply a unified diff patch to a workspace file with optional dry-run validation and diff preview.",
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   execute: async (input, _context): Promise<string | ContentResult> => {
     const args = codeChangeSchema.parse(input as ApplyCodeChangeArgs);
     const root = getWorkspaceRoot();

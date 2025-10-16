@@ -3,6 +3,9 @@
   "version": "0.0.2",
   "description": "template for ts projects",
   "type": "module",
+  "bin": {
+    "decaf-mcp": "./lib/bin/clis.cjs"
+  },
   "exports": {
     "require": "./lib/index.cjs",
     "import": "./lib/esm/index.js"
@@ -18,8 +21,9 @@
     "set-git-auth": "git config url.\"https://api:$(cat .token)@github.com/\".insteadOf \"https://github.com/\" && git config url.\"https://ssh:$(cat .token)@github.com/\".insteadOf \"ssh://git@github.com/\" && git config url.\"https://git:$(cat .token)@github.com/\".insteadOf \"git@github.com:\"",
     "flash-forward": "npx npm-check-updates -u && npm run do-install",
     "reset": "rm -rf * && git checkout . && git pull && npm run do-install",
-    "build": "node ./bin/build-scripts.cjs --dev",
-    "build:prod": "node ./bin/build-scripts.cjs --prod",
+    "build": "node ./bin/build-scripts.cjs --dev && npm run make-exec",
+    "build:prod": "node ./bin/build-scripts.cjs --prod && npm run make-exec",
+    "make-exec": "chmod u+x ./lib/bin/cli.cjs && sed -i '1i #!/usr/bin/env node' ./lib/bin/cli.cjs",
     "test": "jest --runInBand --detectOpenHandles",
     "test:unit": "jest --testPathPattern=\"/tests/unit\" --passWithNoTests --detectOpenHandles",
     "test:integration": "jest --testPathPattern=\"/tests/(integration)\" --passWithNoTests --detectOpenHandles",

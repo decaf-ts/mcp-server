@@ -119,7 +119,7 @@ export class McpWrapper extends LoggedClass {
    *   end
    *   CliWrapper->>Console: Log loaded modules
    */
-  private async boot(args: string[]) {
+  private async boot() {
     const log = this.log.for(this.boot);
 
     const basePath = path.resolve(this.rootPath, this.basePath);
@@ -129,16 +129,11 @@ export class McpWrapper extends LoggedClass {
       if (module.includes("@decaf-ts/mcp")) {
         continue;
       }
-      let pkg: string;
-      let version: string;
       try {
         const res = await this.load(server, module);
-        pkg = res.package;
-        version = res.version;
         server = res.mcp;
       } catch (e: unknown) {
         log.error(`Failed to load MCP configs for ${module}: ${e}`);
-        continue;
       }
     }
     console.log(
@@ -191,7 +186,8 @@ export class McpWrapper extends LoggedClass {
    *   Command-->>CliWrapper: result
    *   CliWrapper-->>Client: result
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async run(args: string[] = process.argv) {
-    await this.boot(args);
+    await this.boot();
   }
 }
