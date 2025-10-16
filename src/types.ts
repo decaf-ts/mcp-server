@@ -1,6 +1,4 @@
-import { Server } from "@modelcontextprotocol/sdk/server";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { MCP_FILE_NAME } from "./constants";
+import { FastMCP } from "fastmcp";
 
 /**
  * @description Function type for Decaf MCP modules
@@ -11,4 +9,8 @@ import { MCP_FILE_NAME } from "./constants";
  * @return {Server|Promise<Server>} A Command object or Promise that resolves to a Server object
  * @memberOf module:CLI
  */
-export type McpModule = () => Server | Promise<Server>;
+export type McpModule = {
+  enrich(mcp: FastMCP): FastMCP | Promise<FastMCP>;
+  PACKAGE_NAME: string;
+  VERSION: string;
+};

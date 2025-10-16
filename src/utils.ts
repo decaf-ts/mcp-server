@@ -1,8 +1,6 @@
 import path from "path";
 import fs from "fs";
-import { Command } from "commander";
 import { McpModule } from "./types";
-import { FastMCP } from "fastmcp";
 
 /**
  * @description Utility class for CLI operations
@@ -50,22 +48,6 @@ export class McpUtils {
     return importPromise.then(
       (m: unknown) => ((m as { default: T }).default || m) as T
     );
-  }
-
-  /**
-   * @description Initializes a Command object with package information
-   * @summary Sets up a Commander Command object with the package name, description, and version from the package.json file
-   *
-   * @param {Command} mcp The Command object to initialize
-   * @param {string} [basePath] The base path where the package.json file is located, defaults to the current working directory
-   * @return {void}
-   */
-  static initialize(mcp: FastMCP, basePath: string) {
-    const name = McpUtils.packageName(basePath);
-    mcp
-      .name(name)
-      .description(`Runs ${name} related commands`)
-      .version(McpUtils.packageVersion(basePath));
   }
 
   /**

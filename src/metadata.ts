@@ -8,5 +8,6 @@ import { Metadata } from "@decaf-ts/decoration";
  * @type {string}
  */
 export const VERSION = "##VERSION##";
+export const PACKAGE_NAME = "##PACKAGE_NAME##";
 
-Metadata.registerLibrary("@decaf-ts/mcp-server", VERSION);
+Metadata.registerLibrary(PACKAGE_NAME, VERSION);

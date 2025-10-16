@@ -7,6 +7,5 @@
 export * from "./mcp";
 export * from "./constants";
 export * from "./McpWrapper";
-export * from "./metadata";
 export * from "./types";
 export * from "./utils";

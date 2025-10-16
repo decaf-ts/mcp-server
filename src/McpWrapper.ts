@@ -1,11 +1,10 @@
-import { Command } from "commander";
 import fs from "fs";
 import path from "path";
 import { MCP_FILE_NAME } from "./constants";
 import { McpUtils } from "./utils";
 import { FastMCP } from "fastmcp";
 import { LoggedClass } from "@decaf-ts/logging";
-import { server } from "typescript";
+import { VERSION } from "./metadata";
 
 /**
  * @description Utility class to handle CLI functionality from all Decaf modules
@@ -25,8 +24,8 @@ import { server } from "typescript";
  * @class McpWrapper
  */
 export class McpWrapper extends LoggedClass {
-  private _command?: Command;
-  private modules: Record<string, Command> = {};
+  private _mcp?: FastMCP;
+  private modules: Record<string, string> = {};
   private readonly rootPath: string;
 
   constructor(
@@ -43,60 +42,51 @@ export class McpWrapper extends LoggedClass {
    * @return {Command} The initialized Command object
    * @private
    */
-  private get command() {
-    if (!this._command) {
-      this._command = new Command();
-      McpUtils.initialize(this._command, this.rootPath);
+  private get mcp() {
+    if (!this._mcp) {
+      this._mcp = new FastMCP({
+        name: "decaf-ts MCP server",
+        instructions: "",
+        version: VERSION as any,
+      });
     }
-    return this._command;
+    return this._mcp;
   }
 
   /**
-   * @description Loads and registers a module from a file
-   * @summary Dynamically imports a CLI module from the specified file path, initializes it, and registers it in the modules collection
+   * @description Loads and registers an mcp extension module from a file
+   * @summary Dynamically imports an mcp extension module from the specified file path, initializes it, and registers it in the modules collection
    *
-   * @param {string} filePath Path to the module file to load
-   * @param {string} rootPath Repository root path to find the package.json
-   * @return {Promise<string>} A promise that resolves to the module name
-   *
-   * @private
-   * @mermaid
-   * sequenceDiagram
-   *   participant CliWrapper
-   *   participant CLIUtils
-   *   participant Module
-   *
-   *   CliWrapper->>CLIUtils: loadFromFile(filePath)
-   *   CLIUtils-->>CliWrapper: module
-   *   CliWrapper->>CliWrapper: Get module name
-   *   CliWrapper->>Command: new Command()
-   *   Command-->>CliWrapper: cmd
-   *   CliWrapper->>CLIUtils: initialize(cmd, path.dirname(rootPath))
-   *   CliWrapper->>Module: module()
-   *   Note over CliWrapper,Module: Handle Promise if needed
-   *   Module-->>CliWrapper: Command instance
-   *   CliWrapper->>CliWrapper: Store in modules[name]
-   *   CliWrapper-->>CliWrapper: Return name
    */
   private async load(
     server: FastMCP,
-    filePath: string,
-    rootPath: string
-  ): Promise<string> {
-    let name;
+    filePath: string
+  ): Promise<{ mcp: FastMCP; package: string; version: string }> {
+    const log = this.log.for(this.load);
+
+    let pkg: string, version: string, enrich: any;
     try {
-      const module = await McpUtils.loadFromFile(filePath);
-      name = module.name;
-      McpUtils.initialize(server, rootPath);
-      let m = module();
-      if (m instanceof Promise) m = await m;
-      this.modules[name] = m;
+      const res = await McpUtils.loadFromFile(filePath);
+      pkg = res.PACKAGE_NAME;
+      version = res.VERSION;
+      enrich = res.enrich;
+    } catch (e: unknown) {
+      throw new Error((e as any).message || (e as any));
+    }
+    try {
+      log.info(`Enriching mcp server with module ${pkg} v${version}`);
+      const result = enrich(server);
+      server = result instanceof Promise ? await result : result;
     } catch (e: unknown) {
       throw new Error(
-        `failed to load module ${name || "unnamed"} under ${filePath}: ${e instanceof Error ? e.message : e}`
+        `failed to enrich mcp with module ${pkg || "unnamed"} under ${filePath}: ${e instanceof Error ? e.message : e}`
       );
     }
-    return name;
+    return {
+      mcp: server,
+      package: pkg,
+      version: version,
+    };
   }
 
   /**
@@ -128,33 +118,27 @@ export class McpWrapper extends LoggedClass {
    *   end
    *   CliWrapper->>Console: Log loaded modules
    */
-  private async boot() {
+  private async boot(args: string[]) {
     const log = this.log.for(this.boot);
-    const server = new FastMCP({});
+
     const basePath = path.resolve(this.rootPath, this.basePath);
     const modules = this.crawl(basePath, this.crawlLevels);
+    let server = this.mcp;
     for (const module of modules) {
       if (module.includes("@decaf-ts/mcp")) {
         continue;
       }
-      let name: string;
+      let pkg: string;
+      let version: string;
       try {
-        name = await this.load(module, this.rootPath);
+        const res = await this.load(server, module);
+        pkg = res.package;
+        version = res.version;
+        server = res.mcp;
       } catch (e: unknown) {
         log.error(`Failed to load MCP configs for ${module}: ${e}`);
         continue;
       }
-
-      if (
-        !this.command.commands.find(
-          (c) => (c as unknown as Record<string, string>)["_name"] === name
-        )
-      )
-        try {
-          this.command.command(name).addCommand(this.modules[name]);
-        } catch (e: unknown) {
-          console.error(e);
-        }
     }
     console.log(
       `loaded modules:\n${Object.keys(this.modules)
@@ -207,7 +191,6 @@ export class McpWrapper extends LoggedClass {
    *   CliWrapper-->>Client: result
    */
   async run(args: string[] = process.argv) {
-    await this.boot();
-    return this.command.parseAsync(args);
+    await this.boot(args);
   }
 }

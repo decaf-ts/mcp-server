@@ -1,6 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { McpModule } from "./types";
-
 /**
  * @description The filename that identifies Decaf CLI modules
  * @summary The standard filename for CLI module files where each library must export a single CliModule function

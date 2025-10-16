@@ -126,11 +126,13 @@
     "@decaf-ts/cli": "latest",
     "@decaf-ts/decoration": "latest",
     "@decaf-ts/logging": "latest",
-    "fastmcp": "^3.19.0",
+    "diff": "^7.0.0",
     "ts-morph": "^21.0.0",
     "typescript": "^5.6.3",
-    "diff": "^7.0.0",
     "zod": "^3.25.76"
   },
-  "license": "MIT OR AGPL-3.0-only"
+  "license": "MIT OR AGPL-3.0-only",
+  "dependencies": {
+    "fastmcp": "^3.20.0"
+  }
 }
