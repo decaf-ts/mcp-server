@@ -1,6 +1,6 @@
-import fs from "fs";
-import os from "os";
-import path from "path";
+import * as fs from "fs";
+import * as os from "os";
+import * as path from "path";
 import { createTwoFilesPatch } from "diff";
 import { FastMCP } from "fastmcp";
 import enrich, {
@@ -29,7 +29,10 @@ describe("MCP module integration", () => {
 
     const filePath = path.join(workspace, "src", "module.ts");
     fs.mkdirSync(path.dirname(filePath), { recursive: true });
-    fs.writeFileSync(filePath, "export function add(a: number, b: number) {\n  return a + b;\n}\n");
+    fs.writeFileSync(
+      filePath,
+      "export function add(a: number, b: number) {\n  return a + b;\n}\n"
+    );
   }
 
   afterEach(() => {
@@ -60,7 +63,7 @@ describe("MCP module integration", () => {
 
     const docResult = (await tools.documentCodeTool.execute(
       { filePath },
-      {} as unknown
+      {} as any
     )) as ContentResult;
 
     expect(docResult.content[0].text).toContain("module.ts");
@@ -72,8 +75,9 @@ describe("MCP module integration", () => {
     await tools.applyCodeChangeTool.execute({ filePath, patch }, {} as unknown);
 
     const finalContent = fs.readFileSync(absolute, "utf-8");
-    expect(finalContent.startsWith("/**\n * Adds two numbers together."))
-      .toBe(true);
+    expect(finalContent.startsWith("/**\n * Adds two numbers together.")).toBe(
+      true
+    );
   });
 
   test("resource templates expose source files to IDE schemes", async () => {

@@ -1,4 +1,3 @@
-/* istanbul ignore file */
 declare module "diff" {
   export function applyPatch(source: string, patch: string): string | false;
   export function createTwoFilesPatch(

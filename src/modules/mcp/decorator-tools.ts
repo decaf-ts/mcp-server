@@ -42,7 +42,11 @@ function collectDecoratorNames(
   return names;
 }
 
-function ensureImport(content: string, importsFrom: string, decorators: Set<string>) {
+function ensureImport(
+  content: string,
+  importsFrom: string,
+  decorators: Set<string>
+) {
   /* istanbul ignore next */
   if (!decorators.size) return content;
   const importRegex = new RegExp(
@@ -57,7 +61,10 @@ function ensureImport(content: string, importsFrom: string, decorators: Set<stri
       .map((name) => name.trim())
       .filter(Boolean);
     const merged = Array.from(new Set([...existing, ...sorted])).sort();
-    return content.replace(importRegex, `import { ${merged.join(", ")} } from "${importsFrom}";`);
+    return content.replace(
+      importRegex,
+      `import { ${merged.join(", ")} } from "${importsFrom}";`
+    );
   }
 
   const importLine = `import { ${sorted.join(", ")} } from "${importsFrom}";`;
@@ -65,7 +72,9 @@ function ensureImport(content: string, importsFrom: string, decorators: Set<stri
 }
 
 function addPropertyBlock(property: AttributeSpec) {
-  const decorators = (property.decorators || []).map(formatDecorator).join("\n  ");
+  const decorators = (property.decorators || [])
+    .map(formatDecorator)
+    .join("\n  ");
   const decoratorBlock = decorators ? `  ${decorators}\n` : "";
   return `${decoratorBlock}  ${property.name}: ${property.type};`;
 }
@@ -75,7 +84,10 @@ function removePropertyBlock(content: string, propertyName: string) {
   const result: string[] = [];
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
-    if (line.trim().startsWith(`@`) && lines[i + 1]?.includes(`${propertyName}:`)) {
+    if (
+      line.trim().startsWith(`@`) &&
+      lines[i + 1]?.includes(`${propertyName}:`)
+    ) {
       continue;
     }
     if (line.includes(`${propertyName}:`)) {
@@ -87,10 +99,14 @@ function removePropertyBlock(content: string, propertyName: string) {
   return result.join("\n");
 }
 
-function insertDecorator(content: string, decorator: DecoratorSpec, target: {
-  kind: "class" | "property";
-  name?: string;
-}) {
+function insertDecorator(
+  content: string,
+  decorator: DecoratorSpec,
+  target: {
+    kind: "class" | "property";
+    name?: string;
+  }
+) {
   const decoratorLine = formatDecorator(decorator);
   if (target.kind === "class") {
     const classRegex = /(export\s+class\s+[^\s{]+\s*\{)/;
@@ -113,11 +129,18 @@ function insertDecorator(content: string, decorator: DecoratorSpec, target: {
   );
 }
 
-function removeDecorator(content: string, decoratorName: string, target: {
-  kind: "class" | "property";
-  name?: string;
-}) {
-  const decoratorRegex = new RegExp(`^\s*@${escapeRegExp(decoratorName)}\\([^)]*\\)`, "m");
+function removeDecorator(
+  content: string,
+  decoratorName: string,
+  target: {
+    kind: "class" | "property";
+    name?: string;
+  }
+) {
+  const decoratorRegex = new RegExp(
+    `^\\s*@${escapeRegExp(decoratorName)}\\([^)]*\\)`,
+    "m"
+  );
   if (target.kind === "class") {
     return content.replace(decoratorRegex, "");
   }
@@ -128,7 +151,6 @@ function removeDecorator(content: string, decoratorName: string, target: {
     );
     return content.replace(pattern, "");
   }
-  /* istanbul ignore next */
   return content;
 }
 
@@ -152,12 +174,17 @@ export const decoratorTools = {
       if (!args.overwrite && fs.existsSync(args.filePath)) {
         throw new Error(`File already exists at ${args.filePath}`);
       }
-      const decorators = collectDecoratorNames(args.classDecorators, args.properties);
+      const decorators = collectDecoratorNames(
+        args.classDecorators,
+        args.properties
+      );
       let content = `@model()`;
       for (const decorator of args.classDecorators || []) {
         content += `\n${formatDecorator(decorator)}`;
       }
-      const properties = (args.properties || []).map(addPropertyBlock).join("\n\n");
+      const properties = (args.properties || [])
+        .map(addPropertyBlock)
+        .join("\n\n");
       content += `\nexport class ${args.className} {\n${properties ? `${properties}\n` : ""}}\n`;
       content = ensureImport(content, args.importsFrom, decorators);
       writeIfChanged(args.filePath, content);
@@ -194,7 +221,11 @@ export const decoratorTools = {
   removeAttributeTool: {
     name: "remove-attribute",
     description: "Remove an attribute from a model class",
-    execute: async (args: { filePath: string; className: string; attributeName: string }) => {
+    execute: async (args: {
+      filePath: string;
+      className: string;
+      attributeName: string;
+    }) => {
       if (!fs.existsSync(args.filePath)) return { filePath: args.filePath };
       const content = fs.readFileSync(args.filePath, "utf8");
       const updated = removePropertyBlock(content, args.attributeName);
@@ -242,14 +273,21 @@ export const decoratorTools = {
   scaffoldValidatorTool: {
     name: "scaffold-validator",
     description: "Scaffold a validator class and optional decorator",
-    execute: async (args: { validatorsDir: string; decoratorDir?: string; name: string }) => {
+    execute: async (args: {
+      validatorsDir: string;
+      decoratorDir?: string;
+      name: string;
+    }) => {
       const classFile = path.join(args.validatorsDir, `${args.name}.ts`);
       ensureDirectory(classFile);
       const classContent = `export class ${args.name} {\n  validate(value: unknown): boolean {\n    return value !== undefined;\n  }\n}\n`;
       fs.writeFileSync(classFile, classContent);
       let decoratorFile: string | undefined;
       if (args.decoratorDir) {
-        decoratorFile = path.join(args.decoratorDir, `${args.name}Decorator.ts`);
+        decoratorFile = path.join(
+          args.decoratorDir,
+          `${args.name}Decorator.ts`
+        );
         ensureDirectory(decoratorFile);
         fs.writeFileSync(
           decoratorFile,

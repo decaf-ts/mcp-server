@@ -1,15 +1,9 @@
 import fs from "fs";
 import path from "path";
-import type {
-  FastMCP,
-  ContentResult,
-  InputPrompt,
-  ResourceTemplate,
-  Tool,
-} from "fastmcp";
+import type { FastMCP, ContentResult, InputPrompt, Tool } from "fastmcp";
 import { applyPatch, createTwoFilesPatch } from "diff";
 import { z } from "zod";
-import { PACKAGE_NAME as PKG, VERSION as V } from "../metadata";
+import { PACKAGE_NAME as PKG, VERSION as V } from "../../metadata";
 import { decoratorTools } from "./decorator-tools";
 
 const WORKSPACE_ROOT_ENV = "MCP_WORKSPACE_ROOT";
@@ -98,9 +92,9 @@ async function getUserErrorCtor(): Promise<new (message: string) => Error> {
   if (!userErrorCtor) {
     try {
       const mod = await import("fastmcp");
-      userErrorCtor = (mod as { UserError: new (message: string) => Error }).UserError;
+      userErrorCtor = (mod as { UserError: new (message: string) => Error })
+        .UserError;
     } catch {
-      /* istanbul ignore next */
       userErrorCtor = class MCPUserError extends Error {
         constructor(message: string) {
           super(message);
@@ -155,7 +149,10 @@ const documentCodeTool: Tool<undefined, typeof documentCodeSchema> = {
       );
     }
 
-    const prompt = selectPrompt(prompts, args.promptName ?? DEFAULT_PROMPT_NAME);
+    const prompt = selectPrompt(
+      prompts,
+      args.promptName ?? DEFAULT_PROMPT_NAME
+    );
 
     return buildDocumentationPayload({
       filePath: args.filePath,
@@ -208,7 +205,9 @@ const applyCodeChangeTool: Tool<undefined, typeof codeChangeSchema> = {
     }
     /* istanbul ignore next */
     if (patched === false) {
-      return throwUserError(`Failed to apply provided patch to ${args.filePath}`);
+      return throwUserError(
+        `Failed to apply provided patch to ${args.filePath}`
+      );
     }
 
     if (!args.dryRun) {
@@ -296,7 +295,8 @@ export function buildResourceTemplates(): WorkspaceResourceTemplate[] {
   return [
     {
       name: "vscode-workspace-file",
-      description: "Expose workspace files to Visual Studio Code via vscode:// URIs",
+      description:
+        "Expose workspace files to Visual Studio Code via vscode:// URIs",
       uriTemplate: "vscode://workspace/{path}",
       mimeType: "text/plain",
       arguments: sharedArguments,
@@ -318,7 +318,8 @@ export function buildResourceTemplates(): WorkspaceResourceTemplate[] {
     },
     {
       name: "copilot-workspace-file",
-      description: "Expose workspace files to GitHub Copilot via copilot:// URIs",
+      description:
+        "Expose workspace files to GitHub Copilot via copilot:// URIs",
       uriTemplate: "copilot://workspace/{path}",
       mimeType: "text/plain",
       arguments: sharedArguments,
@@ -332,11 +333,9 @@ export function buildResourceTemplates(): WorkspaceResourceTemplate[] {
 
 function initializeWorkspaceRoot(): string {
   const configured = process.env[WORKSPACE_ROOT_ENV];
-  /* istanbul ignore next */
   if (configured && configured.trim().length > 0) {
     return path.resolve(configured.trim());
   }
-
   return process.cwd();
 }
 
@@ -348,12 +347,14 @@ export function buildDocPrompts(): InputPrompt<undefined>[] {
     load: async () => prompt.content,
   }));
 
-  const integrationPrompts = CLIENT_INTEGRATIONS.map<InputPrompt<undefined>>((integration) => ({
-    name: `integration/${integration.id}`,
-    description: `${integration.display} integration guidance`,
-    load: async () =>
-      `You are coordinating with ${integration.display}. ${integration.instructions}\n\nTools available:\n- document-code\n- apply-code-change\n\nEnsure responses include actionable steps for the client.`,
-  }));
+  const integrationPrompts = CLIENT_INTEGRATIONS.map<InputPrompt<undefined>>(
+    (integration) => ({
+      name: `integration/${integration.id}`,
+      description: `${integration.display} integration guidance`,
+      load: async () =>
+        `You are coordinating with ${integration.display}. ${integration.instructions}\n\nTools available:\n- document-code\n- apply-code-change\n\nEnsure responses include actionable steps for the client.`,
+    })
+  );
 
   return [...fileBasedPrompts, ...integrationPrompts];
 }
@@ -365,13 +366,18 @@ function resolveInWorkspace(root: string, targetPath: string): string {
 
   const relative = path.relative(root, resolved);
   if (relative.startsWith("..") || path.isAbsolute(relative)) {
-    throw new WorkspaceError(`Path ${targetPath} escapes the workspace root at ${root}`);
+    throw new WorkspaceError(
+      `Path ${targetPath} escapes the workspace root at ${root}`
+    );
   }
 
   return resolved;
 }
 
-async function readWorkspaceFile(root: string, target: string): Promise<string> {
+async function readWorkspaceFile(
+  root: string,
+  target: string
+): Promise<string> {
   try {
     const absolute = resolveInWorkspace(root, target);
     return fs.readFileSync(absolute, "utf8" as BufferEncoding);
@@ -419,14 +425,18 @@ function discoverDocPrompts(root: string): DocPrompt[] {
     }
   }
 
-  return Array.from(unique.values()).sort((a, b) => a.name.localeCompare(b.name));
+  return Array.from(unique.values()).sort((a, b) =>
+    a.name.localeCompare(b.name)
+  );
 }
 
 function selectPrompt(prompts: DocPrompt[], requestedName: string): DocPrompt {
   const direct = prompts.find((prompt) => prompt.name === requestedName);
   if (direct) return direct;
 
-  const fallback = prompts.find((prompt) => prompt.name === DEFAULT_PROMPT_NAME);
+  const fallback = prompts.find(
+    (prompt) => prompt.name === DEFAULT_PROMPT_NAME
+  );
   if (fallback) return fallback;
 
   if (!prompts.length) {
@@ -456,11 +466,15 @@ function buildDocumentationPayload({
   const sections: string[] = [];
 
   if (includeMetadata) {
-    sections.push(`# Documentation Request\n- prompt: ${prompt.name}\n- file: ${filePath}`);
+    sections.push(
+      `# Documentation Request\n- prompt: ${prompt.name}\n- file: ${filePath}`
+    );
   }
 
   if (includePrompt) {
-    sections.push(`## Prompt Guidance (${prompt.title})\n\n${prompt.content.trim()}`);
+    sections.push(
+      `## Prompt Guidance (${prompt.title})\n\n${prompt.content.trim()}`
+    );
   }
 
   if (additionalContext?.trim()) {
@@ -468,7 +482,9 @@ function buildDocumentationPayload({
   }
 
   if (includeCode) {
-    sections.push(`## Source\n\n\`\`\`${inferLanguageFromPath(filePath)}\n${fileContent}\n\`\`\``);
+    sections.push(
+      `## Source\n\n\`\`\`${inferLanguageFromPath(filePath)}\n${fileContent}\n\`\`\``
+    );
   }
 
   return {
@@ -488,7 +504,8 @@ function extractDescription(content: string, filePath: string): string {
     .find((line) => line.length > 0);
 
   return (
-    firstLine?.slice(0, 240) ?? `Documentation prompt loaded from ${path.basename(filePath)}`
+    firstLine?.slice(0, 240) ??
+    `Documentation prompt loaded from ${path.basename(filePath)}`
   );
 }
 
