@@ -1,6 +1,6 @@
 import * as path from "path";
 import { FastMCP } from "fastmcp";
-import enrich from "../../src/modules/decoration-assist";
+import enrich from "../../src/modules/mcp/decoration-assist";
 
 function mkServer() {
   return new FastMCP({

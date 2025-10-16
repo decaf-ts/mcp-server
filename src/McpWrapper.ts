@@ -141,6 +141,7 @@ export class McpWrapper extends LoggedClass {
         .map((k) => `- ${k}`)
         .join("\n")}`
     );
+    return server;
   }
 
   /**
@@ -188,6 +189,7 @@ export class McpWrapper extends LoggedClass {
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async run(args: string[] = process.argv) {
-    await this.boot();
+    const server = await this.boot();
+    await server.start({ transportType: "stdio" });
   }
 }

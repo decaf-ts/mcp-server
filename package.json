@@ -4,7 +4,7 @@
   "description": "template for ts projects",
   "type": "module",
   "bin": {
-    "decaf-mcp": "./lib/bin/clis.cjs"
+    "decaf-mcp": "./lib/bin/cli.cjs"
   },
   "exports": {
     "require": "./lib/index.cjs",
