@@ -10,4 +10,12 @@ import { Metadata } from "@decaf-ts/decoration";
 export const VERSION = "##VERSION##";
 export const PACKAGE_NAME = "##PACKAGE_NAME##";
 
-Metadata.registerLibrary(PACKAGE_NAME, VERSION);
+try {
+  Metadata.registerLibrary(PACKAGE_NAME, VERSION);
+} catch (error) {
+  if (error instanceof Error && error.message.includes("already")) {
+    // Ignore duplicate registration during tests/bundling checks.
+  } else {
+    throw error;
+  }
+}

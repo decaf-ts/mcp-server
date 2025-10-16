@@ -37,6 +37,21 @@ describe("@decaf-ts/mcp-server decorator-validation tools", () => {
     expect(content).toContain("@minlength(2)");
   });
 
+  test("fails when overwrite is disabled and file exists", async () => {
+    const dir = tmpDir();
+    const file = path.join(dir, "Existing.ts");
+    fs.writeFileSync(file, "export class Existing {}\n");
+
+    await expect(
+      tools.createOrUpdateModelTool.execute({
+        filePath: file,
+        className: "Existing",
+        properties: [],
+        importsFrom: "@decaf-ts/decorator-validation",
+      } as any)
+    ).rejects.toThrow(/File already exists/);
+  });
+
   test("add and remove attribute", async () => {
     const dir = tmpDir();
     const file = path.join(dir, "Order.ts");
@@ -61,6 +76,40 @@ export class Order {
 
     content = read(file);
     expect(content).not.toContain("total: number;");
+  });
+
+  test("add attribute ignores duplicates and errors on missing files", async () => {
+    const dir = tmpDir();
+    const file = path.join(dir, "Invoice.ts");
+    fs.writeFileSync(file, `import { model } from "@decaf-ts/decorator-validation";
+@model()
+export class Invoice {
+}
+`);
+
+    await tools.addAttributeTool.execute({
+      filePath: file,
+      className: "Invoice",
+      attribute: { name: "id", type: "string", decorators: [ { name: "pattern", args: ["ID-"] } ] },
+      importsFrom: "@decaf-ts/decorator-validation",
+    } as any);
+
+    await tools.addAttributeTool.execute({
+      filePath: file,
+      className: "Invoice",
+      attribute: { name: "id", type: "string", decorators: [] },
+      importsFrom: "@decaf-ts/decorator-validation",
+    } as any);
+
+    const missing = path.join(dir, "Missing.ts");
+    await expect(
+      tools.addAttributeTool.execute({
+        filePath: missing,
+        className: "Void",
+        attribute: { name: "value", type: "number" },
+        importsFrom: "@decaf-ts/decorator-validation",
+      } as any)
+    ).rejects.toThrow(/Model file not found/);
   });
 
   test("apply and remove decorators", async () => {
@@ -102,6 +151,27 @@ export class Product {
 
     content = read(file);
     expect(content).not.toContain("@serializedBy(\"json\")");
+
+    await tools.removeDecoratorTool.execute({
+      filePath: file,
+      className: "Product",
+      target: { kind: "property", name: "sku" },
+      decoratorName: "pattern",
+    } as any);
+
+    content = read(file);
+    expect(content).not.toContain("@pattern");
+
+    const missing = path.join(dir, "MissingProduct.ts");
+    await expect(
+      tools.applyDecoratorTool.execute({
+        filePath: missing,
+        className: "Missing",
+        target: { kind: "class" },
+        decorator: { name: "model" },
+        importsFrom: "@decaf-ts/decorator-validation",
+      } as any)
+    ).rejects.toThrow(/Model file not found/);
   });
 
   test("scaffold validator, serializer and hashing", async () => {

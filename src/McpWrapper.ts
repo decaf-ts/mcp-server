@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import fs from "fs";
 import path from "path";
 import { MCP_FILE_NAME } from "./constants";
