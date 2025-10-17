@@ -1,4 +1,3 @@
-/* istanbul ignore file */
 import fs from "fs";
 import path from "path";
 import { MCP_FILE_NAME } from "./constants";
@@ -40,7 +39,7 @@ export class McpWrapper extends LoggedClass {
   /**
    * @description Retrieves and initializes the Commander Command object
    * @summary Lazy-loads the Command object, initializing it with the package name, description, and version
-   * @return {Command} The initialized Command object
+   * @return {FastMCP} The initialized Command object
    * @private
    */
   private get mcp() {
@@ -121,9 +120,6 @@ export class McpWrapper extends LoggedClass {
    */
   private async boot() {
     const log = this.log.for(this.boot);
-
-    const basePath = path.resolve(this.rootPath, this.basePath);
-    const modules = this.crawl(basePath, this.crawlLevels);
     let server = this.mcp;
     for (const module of modules) {
       if (module.includes("@decaf-ts/mcp")) {

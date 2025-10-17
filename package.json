@@ -1,7 +1,7 @@
 {
   "name": "@decaf-ts/mcp-server",
   "version": "0.0.4",
-  "description": "template for ts projects",
+  "description": "cmp server for code assistance of decaf-ts projects",
   "type": "module",
   "bin": {
     "decaf-mcp": "./lib/bin/cli.cjs"
@@ -13,7 +13,7 @@
   "main": "lib/decaf-mcp.cjs",
   "types": "lib/index.d.ts",
   "scripts": {
-    "start": "node dist/fastmcp-server.js",
+    "start": "node lib/bin/cli.cjs",
     "dev": "tsx watch fastmcp-server.ts",
     "do-install": "NPM_TOKEN=$(cat .npmtoken) npm install",
     "update-scripts": "node ./bin/update-scripts.cjs",
