@@ -5,6 +5,9 @@ import {
   planFeatureSchema,
   documentCodeSchema,
   codeChangeSchema,
+  documentObjectSchema,
+  coverageTaskSchema,
+  readmeImprovementSchema,
 } from "./schemas";
 
 export type AnalyzeRepoArgs = z.infer<typeof analyzeRepoSchema>;
@@ -30,6 +33,12 @@ export type DocumentCodeArgs = z.infer<typeof documentCodeSchema>;
 
 export type ApplyCodeChangeArgs = z.infer<typeof codeChangeSchema>;
 
+export type DocumentObjectArgs = z.infer<typeof documentObjectSchema>;
+
+export type CoverageTaskArgs = z.infer<typeof coverageTaskSchema>;
+
+export type ReadmeImprovementArgs = z.infer<typeof readmeImprovementSchema>;
+
 export type DocPrompt = {
   name: string;
   title: string;
@@ -49,4 +58,17 @@ export type WorkspaceResourceTemplate = {
     required: boolean;
   }>;
   load: (args: { path: string }) => Promise<{ text: string }>;
+};
+
+export type PromptResourceTemplate = {
+  name: string;
+  description: string;
+  uriTemplate: string;
+  mimeType: string;
+  arguments: ReadonlyArray<{
+    name: string;
+    description: string;
+    required: boolean;
+  }>;
+  load: (args: { name: string }) => Promise<{ text: string; uri?: string }>;
 };

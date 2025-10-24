@@ -4,20 +4,40 @@ import {
   documentCodeTool,
   toolList as coreToolList,
 } from "./tools";
+import {
+  coverageEnforcerTool,
+  documentObjectTool,
+  readmeImprovementTool,
+} from "./codex-tools";
 
 export * from "./tools";
+export * from "./codex-tools";
 
-export const toolList = coreToolList;
+const codexToolList = [
+  documentObjectTool,
+  coverageEnforcerTool,
+  readmeImprovementTool,
+];
+
+export const toolList = [...coreToolList, ...codexToolList];
 export const decoratorToolList = Object.values(decoratorTools);
-const [analyzeRepositoryTool, enumerateCapabilitiesTool, planFeatureTool] =
-  coreToolList;
+const [
+  analyzeRepositoryTool,
+  enumerateCapabilitiesTool,
+  planFeatureTool,
+  documentCodeToolRef,
+  applyCodeChangeToolRef,
+] = coreToolList;
 
 export const tools = {
   analyzeRepositoryTool,
   enumerateCapabilitiesTool,
   planFeatureTool,
-  documentCodeTool,
-  applyCodeChangeTool,
+  documentCodeTool: documentCodeToolRef,
+  applyCodeChangeTool: applyCodeChangeToolRef,
+  documentObjectTool,
+  coverageEnforcerTool,
+  readmeImprovementTool,
   ...decoratorTools,
 };
 

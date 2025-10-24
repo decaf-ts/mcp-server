@@ -4,6 +4,12 @@ import conf from "../../jest.config";
 const config: Config.InitialOptions = {
   ...conf,
   collectCoverage: true,
+  collectCoverageFrom: [
+    "src/mcp/prompts/**/*.ts",
+    "src/mcp/resources/**/*.ts",
+    "src/mcp/templates/**/*.ts",
+    "src/mcp/tools/**/*.ts",
+  ],
   coverageDirectory: "./workdocs/reports/coverage",
   reporters: [
     "default",
@@ -21,7 +27,7 @@ const config: Config.InitialOptions = {
         filename: "test-report.html",
         openReport: true,
         expand: true,
-        pageTitle: "ts-workspace Test Report",
+        pageTitle: "@decaf-ts/mcp-server tst report",
         stripSkippedTest: true,
         darkTheme: true,
         enableMergeData: true,
@@ -33,8 +39,8 @@ const config: Config.InitialOptions = {
     global: {
       branches: 70,
       functions: 85,
-      lines: 80,
-      statements: 88,
+      lines: 95,
+      statements: 95,
     },
   },
 };

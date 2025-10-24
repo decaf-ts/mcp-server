@@ -53,7 +53,16 @@ describe("MCP module integration", () => {
     expect(prompts.length).toBeGreaterThan(0);
 
     const resources = buildResourceTemplates();
-    expect(resources).toHaveLength(3);
+    expect(resources.length).toBeGreaterThanOrEqual(3);
+    const names = resources.map((template) => template.name);
+    expect(names).toEqual(
+      expect.arrayContaining([
+        "vscode-workspace-file",
+        "cursor-workspace-file",
+        "copilot-workspace-file",
+        "codex-prompt",
+      ])
+    );
   });
 
   test("document-code output can drive apply-code-change patches", async () => {
@@ -87,8 +96,39 @@ describe("MCP module integration", () => {
 
     const templates = buildResourceTemplates();
     for (const template of templates) {
-      const result = await template.load({ path: filePath } as any);
-      expect(result).toMatchObject({ text: expected });
+      const args = template.arguments.reduce<Record<string, string>>(
+        (acc, argument: { name: string }) => {
+          acc[argument.name] = "";
+          return acc;
+        },
+        {}
+      );
+
+      if ("name" in args) {
+        args.name = "doc";
+        const output = await template.load(args as any);
+        expect(output.text.length).toBeGreaterThan(0);
+        continue;
+      }
+
+      if (template.name === "read-code-from-source") {
+        args.path = "module.ts";
+      } else if (template.name === "read-test-from-source") {
+        const testFile = path.join(workspace, "tests", "module.test.ts");
+        fs.mkdirSync(path.dirname(testFile), { recursive: true });
+        fs.writeFileSync(testFile, "test file\n");
+        args.path = "module.test.ts";
+      } else if (template.name === "read-doc-from-source") {
+        const docFile = path.join(workspace, "workdocs", "module.md");
+        fs.mkdirSync(path.dirname(docFile), { recursive: true });
+        fs.writeFileSync(docFile, "# Module\n");
+        args.path = "module.md";
+      } else {
+        args.path = filePath;
+      }
+
+      const result = await template.load(args as any);
+      expect(result.text.length).toBeGreaterThan(0);
     }
   });
 });

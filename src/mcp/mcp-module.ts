@@ -42,7 +42,10 @@ export function enrich(mcp: FastMCP): FastMCP {
   }
 
   for (const resource of resources) {
-    mcp.addResource(resource as any);
+    const addResource = (mcp as unknown as { addResource?: (res: unknown) => void }).addResource;
+    if (typeof addResource === "function") {
+      addResource.call(mcp, resource as any);
+    }
   }
 
   return mcp;

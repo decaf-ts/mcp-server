@@ -11,6 +11,26 @@ import { getWorkspaceRoot } from "../workspace";
 
 export const prompts: InputPrompt<undefined>[] = [];
 
+const OBJECT_PROMPT_DEPENDENCIES: Record<string, readonly string[]> = {
+  module: ["doc", "module"],
+  file: ["doc", "file"],
+  class: ["doc", "class"],
+  function: ["doc", "function"],
+  interface: ["doc", "interface"],
+  decorator: ["doc", "decorator"],
+  constant: ["doc", "constant"],
+  "bulk-docs": ["bulk-docs"],
+  "bulk-tests": ["bulk-tests"],
+  "update-readme": ["update-readme"],
+  "repo-setup": ["repo-setup"],
+  "release-notes": ["release-notes"],
+  "mcp-module": ["mcp-module"],
+};
+
+export function getObjectPromptDependencies(): Record<string, readonly string[]> {
+  return OBJECT_PROMPT_DEPENDENCIES;
+}
+
 export function buildPrompts(repoPath: string): InputPrompt<undefined>[] {
   return [
     {
@@ -43,10 +63,60 @@ export function buildDocPrompts(): InputPrompt<undefined>[] {
   return [...fileBasedPrompts, ...integrationPrompts];
 }
 
+function summarizePromptContent(
+  prompt: DocPrompt,
+  headingPrefix: string
+): string {
+  return [`## ${headingPrefix}`, "", prompt.content.trim()].join("\n");
+}
+
+export function buildObjectPrompts(): InputPrompt<undefined>[] {
+  const root = getWorkspaceRoot();
+  const discovered = discoverDocPrompts(root);
+  const promptByName = new Map<string, DocPrompt>();
+  for (const prompt of discovered) {
+    promptByName.set(prompt.name, prompt);
+  }
+
+  const outputs: InputPrompt<undefined>[] = [];
+  for (const [objectType, dependencies] of Object.entries(
+    OBJECT_PROMPT_DEPENDENCIES
+  )) {
+    const existing = dependencies
+      .map((name) => promptByName.get(name))
+      .filter((prompt): prompt is DocPrompt => Boolean(prompt));
+    if (!existing.length) continue;
+
+    outputs.push({
+      name: `codex/${objectType}`,
+      description: `Guidance derived from .codex prompts for ${objectType} tasks.`,
+      load: async () => {
+        const sections = existing.map((prompt) =>
+          summarizePromptContent(prompt, toTitleCase(prompt.name))
+        );
+        return [
+          `# Codex guidance for ${objectType}`,
+          "",
+          ...sections,
+        ].join("\n");
+      },
+    });
+  }
+
+  return outputs.sort((a, b) => a.name.localeCompare(b.name));
+}
+
 export function refreshPrompts(repoPath?: string): InputPrompt<undefined>[] {
   const docPrompts = buildDocPrompts();
+  const objectPrompts = buildObjectPrompts();
   const repoPrompts = repoPath ? buildPrompts(repoPath) : [];
-  prompts.splice(0, prompts.length, ...docPrompts, ...repoPrompts);
+  prompts.splice(
+    0,
+    prompts.length,
+    ...docPrompts,
+    ...objectPrompts,
+    ...repoPrompts
+  );
   return prompts;
 }
 

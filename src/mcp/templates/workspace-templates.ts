@@ -3,7 +3,7 @@ import { getWorkspaceRoot, readWorkspaceFile } from "../workspace";
 
 export const workspaceResourceTemplates: WorkspaceResourceTemplate[] = [];
 
-export function buildResourceTemplates(): WorkspaceResourceTemplate[] {
+export function buildWorkspaceResourceTemplates(): WorkspaceResourceTemplate[] {
   const root = getWorkspaceRoot();
   const sharedArguments = [
     {

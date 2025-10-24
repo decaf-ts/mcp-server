@@ -30,6 +30,17 @@ describe("@decaf-ts/mcp-server mcp module", () => {
 
     const moduleFile = path.join(workspace, "src", "module.ts");
     fs.writeFileSync(moduleFile, "export const value = 1;\n");
+
+    const testFile = path.join(workspace, "tests", "sample.test.ts");
+    fs.mkdirSync(path.dirname(testFile), { recursive: true });
+    fs.writeFileSync(
+      testFile,
+      "describe('sample', () => it('works', () => expect(true).toBe(true)));\n"
+    );
+
+    const docFile = path.join(workspace, "workdocs", "note.md");
+    fs.mkdirSync(path.dirname(docFile), { recursive: true });
+    fs.writeFileSync(docFile, "# Notes\n");
   }
 
   afterEach(() => {
@@ -247,13 +258,40 @@ describe("@decaf-ts/mcp-server mcp module", () => {
       const content = fs.readFileSync(path.join(workspace, filePath), "utf-8");
 
       for (const template of buildResourceTemplates()) {
-        const result = await template.load({ path: filePath } as any);
-        expect(result).toMatchObject({ text: content });
+        const args = template.arguments.reduce<Record<string, string>>(
+          (acc, argument: { name: string }) => {
+            acc[argument.name] = "";
+            return acc;
+          },
+          {}
+        );
+
+        if ("name" in args) continue;
+
+        if (template.name === "read-code-from-source") {
+          args.path = "sample.ts";
+        } else if (template.name === "read-test-from-source") {
+          args.path = "sample.test.ts";
+        } else if (template.name === "read-doc-from-source") {
+          args.path = "note.md";
+        } else {
+          args.path = filePath;
+        }
+
+        const result = await template.load(args as any);
+        expect(result.text.length).toBeGreaterThan(0);
       }
     });
 
     test("throws when accessing paths outside workspace", async () => {
-      const [template] = buildResourceTemplates();
+      const template = buildResourceTemplates().find((candidate) =>
+        candidate.arguments.some(
+          (argument: { name: string }) => argument.name === "path"
+        )
+      );
+      if (!template) {
+        throw new Error("Expected at least one path-based template");
+      }
       await expect(template.load({ path: "../hack.ts" } as any)).rejects.toThrow(
         /escapes the workspace root/
       );

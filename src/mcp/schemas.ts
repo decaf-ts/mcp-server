@@ -84,3 +84,41 @@ export const codeChangeSchema = z
     encoding: z.string().default("utf8"),
   })
   .strict();
+
+const OBJECT_TYPES = [
+  "module",
+  "file",
+  "class",
+  "function",
+  "interface",
+  "decorator",
+  "constant",
+] as const;
+
+export const documentObjectSchema = z
+  .object({
+    basePath: z.string().min(1, "basePath is required"),
+    objectType: z.enum(OBJECT_TYPES),
+    targetFile: z.string().optional(),
+    includeContent: z.boolean().default(false),
+  })
+  .strict();
+
+export const coverageTaskSchema = z
+  .object({
+    basePath: z.string().min(1, "basePath is required"),
+    coverage: z
+      .number({ description: "Target coverage percentage" })
+      .min(0)
+      .max(100)
+      .default(90),
+    dryRun: z.boolean().default(false),
+  })
+  .strict();
+
+export const readmeImprovementSchema = z
+  .object({
+    basePath: z.string().min(1, "basePath is required"),
+    includeExamples: z.boolean().default(true),
+  })
+  .strict();

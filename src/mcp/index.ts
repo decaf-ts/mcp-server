@@ -5,6 +5,7 @@ import { resources } from "./resources";
 import { buildResourceTemplates } from "./templates";
 
 export * from "./mcp-module";
+export { default } from "./mcp-module";
 
 export function EnrichCore(server: FastMCP) {
   loadPrompts();
