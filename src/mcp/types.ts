@@ -1,10 +1,11 @@
-import { z } from "zod/index";
+import { z } from "zod";
 import {
   analyzeRepoSchema,
   enumerateCapabilitiesSchema,
   planFeatureSchema,
+  documentCodeSchema,
+  codeChangeSchema,
 } from "./schemas";
-import { documentCodeSchema } from "./mcp-module";
 
 export type AnalyzeRepoArgs = z.infer<typeof analyzeRepoSchema>;
 export type EnumerateCapabilitiesArgs = z.infer<

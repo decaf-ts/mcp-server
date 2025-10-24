@@ -1,15 +1,29 @@
 import fs from "fs";
 import path from "path";
 import { ContentResult, Tool } from "fastmcp";
+import { applyPatch, createTwoFilesPatch } from "diff";
 import {
   analyzeRepoSchema,
+  codeChangeSchema,
+  documentCodeSchema,
   enumerateCapabilitiesSchema,
   planFeatureSchema,
 } from "../schemas";
 import { analyzeRepo } from "../code";
 import { deriveCapabilities } from "../utils";
-import { getWorkspaceRoot } from "../mcp-module";
-import { applyPatch, createTwoFilesPatch } from "diff";
+import {
+  getWorkspaceRoot,
+  resolveInWorkspace,
+  throwUserError,
+  WorkspaceError,
+} from "../workspace";
+import {
+  buildDocumentationPayload,
+  DEFAULT_PROMPT_NAME,
+  discoverDocPrompts,
+  selectPrompt,
+} from "../prompts/prompts";
+import type { ApplyCodeChangeArgs, DocumentCodeArgs } from "../types";
 
 export function buildAnalyzeRepositoryTool(): Tool<
   undefined,
@@ -330,3 +344,16 @@ export const applyCodeChangeTool: Tool<undefined, typeof codeChangeSchema> = {
   parameters: codeChangeSchema,
 };
 
+type AnyTool = Tool<undefined, any>;
+
+const analyticTools: AnyTool[] = [
+  buildAnalyzeRepositoryTool(),
+  buildEnumerateCapabilitiesTool(),
+  buildPlanFeatureTool(),
+];
+
+export const toolList: AnyTool[] = [
+  ...analyticTools,
+  documentCodeTool,
+  applyCodeChangeTool,
+];

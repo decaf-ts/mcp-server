@@ -1,17 +1,20 @@
+import path from "path";
+import type { DecorationResourceTemplate } from "../types";
+import { getWorkspaceRoot, readWorkspaceFile } from "../workspace";
 
-async function loadFile(root: string, type: "src" | "tests" | "workdocs") {
-  return async function loadFile(obj: { path: string }) {
-    const abs = path.join(root, type, obj.path);
-    const text = readFileSafe(abs) ?? "";
+export const decorationResourceTemplates: DecorationResourceTemplate[] = [];
+
+function makeLoader(type: "src" | "tests" | "workdocs") {
+  return async ({ path: relative }: { path: string }) => {
+    const root = getWorkspaceRoot();
+    const target = path.join(type, relative);
+    const text = await readWorkspaceFile(root, target);
     return { text };
   };
 }
 
-export function buildResourceTemplates(
-  repoPath: string
-): DecorationResourceTemplate[] {
-  const root = path.resolve(process.cwd(), repoPath);
-  return [
+export function buildDecorationResourceTemplates(): DecorationResourceTemplate[] {
+  const templates: DecorationResourceTemplate[] = [
     {
       name: "read-code-from-source",
       description:
@@ -26,7 +29,7 @@ export function buildResourceTemplates(
           required: true,
         },
       ],
-      load: loadFile(root, "src") as any,
+      load: makeLoader("src"),
     },
     {
       name: "read-test-from-source",
@@ -42,7 +45,7 @@ export function buildResourceTemplates(
           required: true,
         },
       ],
-      load: loadFile(root, "tests") as any,
+      load: makeLoader("tests"),
     },
     {
       name: "read-doc-from-source",
@@ -58,7 +61,14 @@ export function buildResourceTemplates(
           required: true,
         },
       ],
-      load: loadFile(root, "workdocs") as any,
+      load: makeLoader("workdocs"),
     },
   ];
+
+  decorationResourceTemplates.splice(
+    0,
+    decorationResourceTemplates.length,
+    ...templates
+  );
+  return decorationResourceTemplates;
 }

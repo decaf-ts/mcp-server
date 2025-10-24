@@ -8,10 +8,10 @@
 export const MCP_FILE_NAME = "mcp-module";
 
 
-const WORKSPACE_ROOT_ENV = "MCP_WORKSPACE_ROOT";
-const PROMPT_DIRECTORIES = [".code/prompts", ".codex/prompts"];
-const DEFAULT_PROMPT_NAME = "doc";
-const CLIENT_INTEGRATIONS = [
+export const WORKSPACE_ROOT_ENV = "MCP_WORKSPACE_ROOT";
+export const PROMPT_DIRECTORIES = [".code/prompts", ".codex/prompts"];
+export const DEFAULT_PROMPT_NAME = "doc";
+export const CLIENT_INTEGRATIONS = [
   {
     id: "vscode",
     display: "Visual Studio Code",
