@@ -226,3 +226,216 @@
 [2m2025-10-24T22:24:17.617475Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","nl -ba .specify/templates/spec-template.md | head -n 160"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
 [2m2025-10-24T22:24:20.930062Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","nl -ba .specify/templates/tasks-template.md | head -n 80"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
 [2m2025-10-24T22:24:26.053435Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","git status -sb"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T22:31:47.176334Z[0m [32m INFO[0m ERR: No such file or directory (os error 2)
+[2m2025-10-24T22:34:09.276438Z[0m [32m INFO[0m ERR: No such file or directory (os error 2)
+[2m2025-10-24T22:38:48.694249Z[0m [32m INFO[0m Turn error: You've hit your usage limit. To get more access now, send a request to your admin or try again in 40 minutes.
+[2m2025-10-24T22:50:34.413113Z[0m [32m INFO[0m Turn error: You've hit your usage limit. To get more access now, send a request to your admin or try again in 28 minutes.
+[2m2025-10-24T23:19:30.001495Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","git fetch --all --prune"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server","timeout_ms":120000}
+[2m2025-10-24T23:19:34.250751Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","git ls-remote --heads origin | grep -E 'refs/heads/[0-9]+-mcp-module-structure$' || true"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:19:38.193851Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","git branch | grep -E '^[* ]*[0-9]+-mcp-module-structure$' || true"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:19:42.193444Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","ls specs 2>/dev/null | grep -E '^[0-9]+-mcp-module-structure$' || true"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:19:45.770379Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","ls .specify/scripts"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:19:50.481709Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","sed -n '1,200p' .specify/scripts/bash/create-new-feature.sh"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:19:54.583373Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","sed -n '200,400p' .specify/scripts/bash/create-new-feature.sh"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:20:03.487703Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc",".specify/scripts/bash/create-new-feature.sh --json --short-name \"mcp-module-structure\" --number 1 \"this repo is an MCP server using FASTMCP to be used by coding assistant LLMs to write code for the decaf-ts typescript framework. keep src/mcp and each folder in ./src/modules with the same structure: - prompts folder that exports a list of prompts for the MCP; - resources folder that export a list of resources for the MCP; - templates folder that export a list of templates; - tools folder that export a list of tools; the main server must consum these exports to enrich\""],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server","timeout_ms":120000}
+[2m2025-10-24T23:20:11.167350Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","ls src"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:20:14.683883Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","ls src/modules"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:20:17.721252Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","ls src/modules/decoration"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:20:21.590238Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","sed -n '1,160p' src/modules/decoration/index.ts"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:20:24.789244Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","ls src/modules/mcp"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:20:28.943769Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","ls src/mcp"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:20:34.310848Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","sed -n '160,320p' .specify/templates/spec-template.md"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:20:44.758412Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","sed -n '1,200p' specs/001-mcp-module-structure/spec.md"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:21:44.250051Z[0m [32m INFO[0m ToolCall: apply_patch *** Begin Patch
+*** Update File: specs/001-mcp-module-structure/spec.md
+@@
+-# Feature Specification: [FEATURE NAME]
+-
+-**Feature Branch**: `[###-feature-name]`  
+-**Created**: [DATE]  
++# Feature Specification: MCP Module Structure Enforcement
++
++**Feature Branch**: `001-mcp-module-structure`  
++**Created**: 2025-10-24  
+ **Status**: Draft  
+-**Input**: User description: "$ARGUMENTS"
++**Input**: User description: "this repo is an MCP server using FASTMCP to be used by coding assistant LLMs to write code for the decaf-ts typescript framework. keep src/mcp and each folder in ./src/modules with the same structure: - prompts folder that exports a list of prompts for the MCP; - resources folder that export a list of resources for the MCP; - templates folder that export a list of templates; - tools folder that export a list of tools; the main server must consum these exports to enrich"
+@@
+-### User Story 1 - [Brief Title] (Priority: P1)
+-
+-[Describe this user journey in plain language]
+-
+-**Why this priority**: [Explain the value and why it has this priority level]
+-
+-**Independent Test**: [Describe how this can be tested independently - e.g., "Can be fully tested by [specific action] and delivers [specific value]"]
+-
+-**Acceptance Scenarios**:
+-
+-1. **Given** [initial state], **When** [action], **Then** [expected outcome]
+-2. **Given** [initial state], **When** [action], **Then** [expected outcome]
++### User Story 1 - Standardize Module Scaffolding (Priority: P1)
++
++Template maintainers need every `src/modules/*` directory (current and future) to share the same four subfolders—`prompts`, `resources`, `templates`, `tools`—each exporting a strongly-typed list so MCP-compatible assistants can rely on predictable structure.
++
++**Why this priority**: Without structural parity the template cannot be safely re-used in downstream repos, creating integration bugs for every new assistant capability.
++
++**Independent Test**: Run the module validation task against a module (real or stub) and confirm it detects any missing folder/export before allowing the module to be published.
++
++**Acceptance Scenarios**:
++
++1. **Given** a maintainer scaffolds a new module under `src/modules`, **When** the scaffolding script runs, **Then** the four folders plus index exports are created with placeholder lists.
++2. **Given** an existing module is missing a folder or list export, **When** validation executes during `npm run lint` or `npm run test:unit`, **Then** it fails with a message naming the offending module and folder.
+@@
+-### User Story 2 - [Brief Title] (Priority: P2)
+-
+-[Describe this user journey in plain language]
+-
+-**Why this priority**: [Explain the value and why it has this priority level]
+-
+-**Independent Test**: [Describe how this can be tested independently]
+-
+-**Acceptance Scenarios**:
+-
+-1. **Given** [initial state], **When** [action], **Then** [expected outcome]
++### User Story 2 - Aggregate Module Assets into MCP Server (Priority: P2)
++
++The MCP server maintainer wants `src/mcp` to mirror the same prompts/resources/templates/tools folders and automatically merge each module’s exported lists so FASTMCP sessions expose a unified catalog.
++
++**Why this priority**: Aggregation keeps assistant responses consistent regardless of which modules supply the assets, and prevents manual wiring errors inside the MCP host.
++
++**Independent Test**: Run a targeted integration test that loads only the MCP layer, injects two sample modules, and verifies the server’s exported arrays include every item exactly once.
++
++**Acceptance Scenarios**:
++
++1. **Given** at least one module exports prompts/resources/templates/tools, **When** the MCP server boots, **Then** it imports each module list and makes the concatenated lists available through the FASTMCP interfaces.
++2. **Given** two modules export items with identical identifiers, **When** the server aggregates them, **Then** it logs a duplication issue and prevents conflicting entries from being registered.
+@@
+-### User Story 3 - [Brief Title] (Priority: P3)
+-
+-[Describe this user journey in plain language]
+-
+-**Why this priority**: [Explain the value and why it has this priority level]
+-
+-**Independent Test**: [Describe how this can be tested independently]
+-
+-**Acceptance Scenarios**:
+-
+-1. **Given** [initial state], **When** [action], **Then** [expected outcome]
++### User Story 3 - LLM Receives Enriched Context (Priority: P3)
++
++Coding assistant LLM operators need every FASTMCP session to present the consolidated prompts, resources, templates, and tools so assistants can reason about the Decaf TS framework without manual lookups.
++
++**Why this priority**: The product’s value is tied to how quickly assistants can discover and use Decaf assets; missing context reduces quality of generated code.
++
++**Independent Test**: Execute an end-to-end run where the MCP server exposes its capability manifest to a mock assistant and verify the assistant receives the enriched artifact lists.
++
++**Acceptance Scenarios**:
++
++1. **Given** a FASTMCP client connects to the Decaf MCP server, **When** it enumerates available prompts/resources/templates/tools, **Then** it sees the aggregated catalog with module provenance metadata.
++2. **Given** a module is temporarily disabled, **When** the assistant requests assets, **Then** the catalog excludes that module while still presenting remaining modules without errors.
+@@
+-### Edge Cases
+-
+-<!--
+-  ACTION REQUIRED: The content in this section represents placeholders.
+-  Fill them out with the right edge cases.
+--->
+-
+-- What happens when [boundary condition]?
+-- How does system handle [error scenario]?
++### Edge Cases
++
++- Module directory exists but only some required folders are present; validation must fail with a clear message and remediation hint.
++- Two modules export identically named prompts/resources/templates/tools; aggregation needs deterministic conflict handling (warn, skip, and surface collision in logs/tests).
++- MCP root directories contain additional experimental content; validation must ignore non-required folders yet enforce the canonical four.
++- Loading dozens of modules simultaneously; aggregation must finish within acceptable startup time without exceeding memory guidance.
+@@
+-### Functional Requirements
+-
+-- **FR-001**: System MUST [specific capability, e.g., "allow users to create accounts"]
+-- **FR-002**: System MUST [specific capability, e.g., "validate email addresses"]  
+-- **FR-003**: Users MUST be able to [key interaction, e.g., "reset their password"]
+-- **FR-004**: System MUST [data requirement, e.g., "persist user preferences"]
+-- **FR-005**: System MUST [behavior, e.g., "log all security events"]
+-
+-*Example of marking unclear requirements:*
+-
+-- **FR-006**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
+-- **FR-007**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
++### Functional Requirements
++
++- **FR-001**: Every folder under `src/modules/*` MUST contain `prompts`, `resources`, `templates`, and `tools` subfolders, each exporting a typed list of assets consumable by FASTMCP.
++- **FR-002**: The `src/mcp` directory MUST mirror the same four folders and expose master lists generated by concatenating the module exports.
++- **FR-003**: A validation routine MUST run during `npm run lint` or `npm run test:unit` to fail the pipeline if any module is missing a folder, lacks an export, or produces an empty list without an explicit `disabled` flag.
++- **FR-004**: Aggregation MUST detect duplicate asset identifiers across modules and output a deterministic error that points to the offending modules while preventing collisions from reaching clients.
++- **FR-005**: Documentation (README/workdocs) MUST describe how to add a new module, the required folder contents, and how the MCP server consumes exports so downstream template users follow the pattern.
++- **FR-006**: The MCP server MUST expose provenance metadata (module name and path) alongside each prompt/resource/template/tool so assistants know the source of each asset.
++- **FR-007**: All generated code and validation changes MUST maintain compatibility with Node ≥22 / npm ≥10 and keep `npm run build`, `npm run build:prod`, and `npm run test:dist` passing to honor Dual-Target Distribution.
+@@
+-### Key Entities *(include if feature involves data)*
+-
+-- **[Entity 1]**: [What it represents, key attributes without implementation]
+-- **[Entity 2]**: [What it represents, relationships to other entities]
++### Key Entities *(include if feature involves data)*
++
++- **Module Export Package**: Conceptual bundle representing one module’s prompts/resources/templates/tools lists plus metadata (module name, version, disabled flag).
++- **MCP Aggregate Catalog**: The combined asset arrays exposed by the MCP server after merging all module export packages and performing validation/conflict resolution.
++- **Validation Report**: Structured output (console + optional JSON) emitted by the validation routine, capturing missing folders, empty exports, duplicates, and guidance for remediation.
++
++## Assumptions
++
++- Existing modules (`src/modules/decoration`, `src/modules/mcp`, future ones) will be backfilled to the standard without deprecating them.
++- Module owners can supply placeholder assets if a folder would otherwise be empty, ensuring validation focuses on structural integrity rather than content completeness.
++- FASTMCP clients expect descriptive errors instead of silent degradation, so surfacing validation failures during CI is sufficient to block regressions.
+@@
+ ### Measurable Outcomes
+ 
+-- **SC-001**: [Measurable metric, e.g., "Users can complete account creation in under 2 minutes"]
+-- **SC-002**: [Measurable metric, e.g., "System handles 1000 concurrent users without degradation"]
+-- **SC-003**: [User satisfaction metric, e.g., "90% of users successfully complete primary task on first attempt"]
+-- **SC-004**: [Business metric, e.g., "Reduce support tickets related to [X] by 50%"]
++- **SC-001**: 100% of modules under `src/modules` pass the structural validation routine with zero missing folders or exports before each merge.
++- **SC-002**: MCP server startup completes in under 3 seconds with up to 20 modules loaded while still aggregating all asset types.
++- **SC-003**: At least 95% of FASTMCP capability manifests generated in testing include provenance metadata for every prompt/resource/template/tool.
++- **SC-004**: Documentation updates reduce maintainer setup time for a new module to under 30 minutes as measured by internal onboarding feedback.
+*** End Patch
+[2m2025-10-24T23:21:48.963527Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","rg \"\\[NEEDS CLARIFICATION\" -n specs/001-mcp-module-structure/spec.md"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:21:58.072148Z[0m [32m INFO[0m ToolCall: apply_patch *** Begin Patch
+*** Add File: specs/001-mcp-module-structure/checklists/requirements.md
++# Specification Quality Checklist: MCP Module Structure Enforcement
++
++**Purpose**: Validate specification completeness and quality before proceeding to planning
++**Created**: 2025-10-24
++**Feature**: ../spec.md
++
++## Content Quality
++
++- [x] No implementation details (languages, frameworks, APIs)
++- [x] Focused on user value and business needs
++- [x] Written for non-technical stakeholders
++- [x] All mandatory sections completed
++
++## Requirement Completeness
++
++- [x] No [NEEDS CLARIFICATION] markers remain
++- [x] Requirements are testable and unambiguous
++- [x] Success criteria are measurable
++- [x] Success criteria are technology-agnostic (no implementation details)
++- [x] All acceptance scenarios are defined
++- [x] Edge cases are identified
++- [x] Scope is clearly bounded
++- [x] Dependencies and assumptions identified
++
++## Feature Readiness
++
++- [x] All functional requirements have clear acceptance criteria
++- [x] User scenarios cover primary flows
++- [x] Feature meets measurable outcomes defined in Success Criteria
++- [x] No implementation details leak into specification
++
++## Notes
++
++- Items marked incomplete require spec updates before `/speckit.clarify` or `/speckit.plan`
+*** End Patch
+[2m2025-10-24T23:22:04.836365Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","nl -ba specs/001-mcp-module-structure/spec.md"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:22:08.727000Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","nl -ba specs/001-mcp-module-structure/checklists/requirements.md"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
