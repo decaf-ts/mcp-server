@@ -51,7 +51,10 @@
     "Slogan": "From resource definition to runtime chill in one server.",
     "Tags": "Runtime, Calm, Server"
   },
-  { "Slogan": "Connect, query, relax.", "Tags": "Workflow, Chill, Developer" },
+  {
+    "Slogan": "Connect, query, relax.",
+    "Tags": "Workflow, Chill, Developer"
+  },
   {
     "Slogan": "Server‑side logic that sits back and sips decaf.",
     "Tags": "Server, Metaphor, Coffee‑themed"
@@ -64,7 +67,10 @@
     "Slogan": "Deploy without the buzz—just business logic.",
     "Tags": "Deploy, Calm, Technical"
   },
-  { "Slogan": "Serve tools, not tremors.", "Tags": "Tools, Calm, Developer" },
+  {
+    "Slogan": "Serve tools, not tremors.",
+    "Tags": "Tools, Calm, Developer"
+  },
   {
     "Slogan": "HTTP, STDIO or SSE—same calm server.",
     "Tags": "Transport, Calm, Tech"
@@ -145,7 +151,10 @@
     "Slogan": "Configuration files that feel like reading a cappuccino menu.",
     "Tags": "Configuration, Humor, Coffee‑themed"
   },
-  { "Slogan": "Serve, don’t sprint.", "Tags": "Workflow, Calm, Developer" },
+  {
+    "Slogan": "Serve, don’t sprint.",
+    "Tags": "Workflow, Calm, Developer"
+  },
   {
     "Slogan": "Endpoints created. Features shipped. Anxiety paused.",
     "Tags": "Workflow, Calm, Technical"
@@ -178,7 +187,10 @@
     "Slogan": "Decaf‑TS MCP‑server: because your data deserves a break too.",
     "Tags": "Branding, Coffee‑themed, Tech"
   },
-  { "Slogan": "Deploy once. Relax always.", "Tags": "Deploy, Calm, Developer" },
+  {
+    "Slogan": "Deploy once. Relax always.",
+    "Tags": "Deploy, Calm, Developer"
+  },
   {
     "Slogan": "Your server stack’s unwinding lounge chair.",
     "Tags": "Stack, Metaphor, Chill"
