@@ -1,5 +1,6 @@
-// ...existing code...
-import { FastMCP } from "fastmcp";
+// NOTE: Do not import `fastmcp` at the top-level. Some dist files in node_modules
+// use `import.meta` and are ESM-only. Loading them unconditionally breaks Jest's
+// runtime transform in some environments. We dynamically import inside startStdio.
 import { z } from "zod";
 import { VERSIOn } from "./version";
 
@@ -18,18 +19,35 @@ export type ResourceMeta = { description?: string; uri?: string } & Record<
 export type TemplateMeta = { description?: string } & Record<string, any>;
 
 export class McpServer {
-  public server: FastMCP;
+  public server: any | undefined;
+  private queuedTools: Array<{
+    name: string;
+    meta: ToolMeta;
+    fn: (...args: any[]) => Promise<any>;
+  }> = [];
+  private queuedPrompts: Array<{
+    name: string;
+    meta: PromptMeta;
+    fn: (args: any) => Promise<any>;
+  }> = [];
+  private queuedResources: Array<{
+    name: string;
+    meta: ResourceMeta;
+    fn: () => Promise<any>;
+  }> = [];
+
   private tools = new Map<string, ToolMeta>();
   private prompts = new Map<string, PromptMeta>();
   private resources = new Map<string, ResourceMeta>();
   private templates = new Map<string, TemplateMeta>();
 
+  private name: string;
+  private version: string;
+
   constructor(opts?: { name?: string; version?: string }) {
-    const name = opts?.name ?? "@decaf-ts/mcp-server";
-    const version = opts?.version ?? (VERSIOn || "0.0.0");
-    this.server = new FastMCP({ name, version });
-    // Register the help tool so clients can introspect capabilities
-    this.registerHelpTool();
+    this.name = opts?.name ?? "@decaf-ts/mcp-server";
+    this.version = opts?.version ?? (VERSIOn || "0.0.0");
+    // do NOT initialize FastMCP synchronously here
   }
 
   registerTool(
@@ -38,21 +56,29 @@ export class McpServer {
     fn: (...args: any[]) => Promise<any>
   ) {
     this.tools.set(name, meta || {});
-    // fastmcp expects input/output schemas as zod objects; callers can pass them via meta
-    return this.server.registerTool(
-      name,
-      {
-        title: meta.title || name,
-        description: meta.description || "",
-        inputSchema: meta.inputSchema || { query: z.string().optional() },
-        outputSchema: meta.outputSchema || undefined,
-      } as any,
-      async (args: any) => {
-        // delegate to provided fn
-        const res = await fn(args);
-        return res;
-      }
-    );
+    if (this.server && typeof this.server.registerTool === "function") {
+      return this.server.registerTool(
+        name,
+        {
+          title: meta.title || name,
+          description: meta.description || "",
+          inputSchema: meta.inputSchema || {
+            query: (z as any).string().optional(),
+          },
+          outputSchema: meta.outputSchema || undefined,
+        } as any,
+        async (args: any) => {
+          const res = await fn(args);
+          return res;
+        }
+      );
+    }
+    // queue for later registration when server starts
+    this.queuedTools.push({ name, meta, fn });
+    // return a placeholder object to satisfy call sites
+    return {
+      disable: () => {},
+    } as any;
   }
 
   registerPrompt(
@@ -61,22 +87,30 @@ export class McpServer {
     fn: (args: any) => Promise<any>
   ) {
     this.prompts.set(name, meta || {});
-    return this.server.registerPrompt(
-      {
-        name,
-        description: meta.description,
-        arguments: meta.arguments || [],
-      } as any,
-      async (args: any) => fn(args)
-    );
+    if (this.server && typeof this.server.registerPrompt === "function") {
+      return this.server.registerPrompt(
+        {
+          name,
+          description: meta.description,
+          arguments: meta.arguments || [],
+        } as any,
+        async (args: any) => fn(args)
+      );
+    }
+    this.queuedPrompts.push({ name, meta, fn });
+    return { disable: () => {} } as any;
   }
 
   registerResource(name: string, meta: ResourceMeta, fn: () => Promise<any>) {
     this.resources.set(name, meta || {});
-    return this.server.registerResource(
-      { name, uri: meta.uri || name, description: meta.description } as any,
-      async () => fn()
-    );
+    if (this.server && typeof this.server.registerResource === "function") {
+      return this.server.registerResource(
+        { name, uri: meta.uri || name, description: meta.description } as any,
+        async () => fn()
+      );
+    }
+    this.queuedResources.push({ name, meta, fn });
+    return { disable: () => {} } as any;
   }
 
   registerTemplate(name: string, meta: TemplateMeta) {
@@ -134,8 +168,8 @@ export class McpServer {
     }
   }
 
-  private registerHelpTool() {
-    // Register a 'help' tool which delegates into this.help
+  private registerHelpOnServer() {
+    if (!this.server || typeof this.server.registerTool !== "function") return;
     try {
       this.server.registerTool(
         "help",
@@ -143,12 +177,11 @@ export class McpServer {
           title: "Help",
           description:
             "Lists available tools, prompts, resources and templates. Use 'help <type> <id>' for details.",
-          inputSchema: { query: z.string().optional() },
+          inputSchema: { query: (z as any).string().optional() },
         } as any,
-        async (args: any, context?: any) => {
+        async (args: any) => {
           const q = args?.query;
           const res = await this.help(q);
-          // Return ContentResult-like structure expected by fastmcp
           return {
             content: [{ type: "text", text: JSON.stringify(res, null, 2) }],
             structuredContent: res,
@@ -156,12 +189,54 @@ export class McpServer {
         }
       );
     } catch (e) {
-      // ignore registration errors in environments where server API differs
-      // but keep help available programmatically
+      // ignore
     }
   }
 
   async startStdio() {
+    // Dynamically import fastmcp to avoid loading ESM node_modules at test parse time
+    const fastmcp = await import("fastmcp");
+    const FastMCP = fastmcp.FastMCP || (fastmcp as any).default || fastmcp;
+    this.server = new FastMCP({ name: this.name, version: this.version });
+
+    // register queued items
+    for (const t of this.queuedTools) {
+      this.server.registerTool(
+        t.name,
+        {
+          title: t.meta.title || t.name,
+          description: t.meta.description || "",
+          inputSchema: t.meta.inputSchema || {
+            query: (z as any).string().optional(),
+          },
+        } as any,
+        async (args: any) => t.fn(args)
+      );
+    }
+    for (const p of this.queuedPrompts) {
+      this.server.registerPrompt(
+        {
+          name: p.name,
+          description: p.meta.description,
+          arguments: p.meta.arguments || [],
+        } as any,
+        async (args: any) => p.fn(args)
+      );
+    }
+    for (const r of this.queuedResources) {
+      this.server.registerResource(
+        {
+          name: r.name,
+          uri: r.meta.uri || r.name,
+          description: r.meta.description,
+        } as any,
+        async () => r.fn()
+      );
+    }
+
+    // Register help tool on actual server
+    this.registerHelpOnServer();
+
     await this.server.start({ transportType: "stdio" });
   }
 }

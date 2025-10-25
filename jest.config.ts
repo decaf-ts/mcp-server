@@ -8,21 +8,25 @@ const config: Config.InitialOptions = {
   testRegex: "/tests/.*\\.(test|spec)\\.(ts|tsx)$",
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
   extensionsToTreatAsEsm: [".ts", ".tsx"],
+  transform: {
+    "^.+\\.(t|j)sx?$": [
+      "ts-jest",
+      {
+        useESM: true,
+        tsconfig: {
+          module: "esnext",
+          target: "es2022",
+        },
+      },
+    ],
+  },
   transformIgnorePatterns: [
     "node_modules/(?!(fastmcp|mcp-proxy|@modelcontextprotocol)/)",
   ],
   moduleNameMapper: {
     "^(\\.{1,2}/.*)\\.js$": "$1",
   },
-  globals: {
-    "ts-jest": {
-      useESM: true,
-      tsconfig: {
-        module: "esnext",
-        target: "es2022",
-      },
-    },
-  },
+  globals: {},
   collectCoverage: false,
   coverageDirectory: "./workdocs/reports/coverage",
   collectCoverageFrom: [
