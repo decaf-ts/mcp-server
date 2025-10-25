@@ -1,0 +1,19 @@
+{
+	"servers": {
+		"decaf-test-mcp": {
+			"type": "stdio",
+			"command": "node",
+			"args": [
+				"lib/bin/cli.cjs"
+			],
+			"cwd": "${workspaceFolder}",
+			"dev": {
+				"watch": "src/**/*.ts",
+				"debug": {
+					"type": "node"
+				}
+			}
+		}
+	},
+	"inputs": []
+}

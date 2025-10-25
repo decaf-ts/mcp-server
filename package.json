@@ -137,6 +137,7 @@
     "@decaf-ts/cli": "latest",
     "@decaf-ts/decoration": "latest",
     "@decaf-ts/logging": "latest",
+    "@modelcontextprotocol/sdk": "^1.20.2",
     "fastmcp": "latest",
     "ts-morph": "^21.0.0",
     "zod": "latest"
