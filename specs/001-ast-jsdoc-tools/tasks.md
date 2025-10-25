@@ -50,7 +50,11 @@
 - [ ] T012 [US1] Implement TOOL1 (AST extraction) in /home/tvenceslau/local-workspace/decaf-ts/mcp-server/tools/ast-jsdoc-tools/src/tools/ast-extractor.ts
 - [ ] T013 [US1] Implement TOOL2 (JSDoc generation) in /home/tvenceslau/local-workspace/decaf-ts/mcp-server/tools/ast-jsdoc-tools/src/tools/jsdoc-generator.ts
 - [ ] T014 [US1] Implement TOOL3 (file processor) in /home/tvenceslau/local-workspace/decaf-ts/mcp-server/tools/ast-jsdoc-tools/src/tools/file-processor.ts
-- [ ] T015 [US1] Create heuristic rules engine in /home/tvenceslau/local-workspace/decaf-ts/mcp-server/tools/ast-jsdoc-tools/src/utils/heuristics.ts
+- [ ] T015 [US1] Create heuristic rules engine in /home/tvenceslau/local-workspace/decaf-ts/mcp-server/tools/ast-jsdoc-tools/src/utils/heuristics.ts with:
+  - Directory-based rules (api/, cli/, lib/, etc.)
+  - Filename pattern rules (*.controller.ts, *.cli.ts, etc.)
+  - Export analysis rules (default exports vs named exports)
+  - Index file special handling
 - [ ] T016 [US1] Implement TOOL4 (repo processor) in /home/tvenceslau/local-workspace/decaf-ts/mcp-server/tools/ast-jsdoc-tools/src/tools/repo-processor.ts
 - [ ] T017 [US1] Add bulk processing CLI commands in /home/tvenceslau/local-workspace/decaf-ts/mcp-server/tools/ast-jsdoc-tools/src/cli/repo-commands.ts
 - [ ] T018 [P] [US1] Create integration test for bulk processing in /home/tvenceslau/local-workspace/decaf-ts/mcp-server/tools/ast-jsdoc-tools/test/integration/repo-processor.test.ts

@@ -70,8 +70,18 @@ As an automated process, I want to provide a single AST object and optional cont
 - **FR-005**: Each tool MUST expose a programmatic API and a CLI wrapper to support automation in scripts and CI flows.
 - **FR-006**: Tools MUST produce machine-readable reports (JSON) listing files processed, objects found, jsdocs suggested, and actions taken (created/updated/unchanged/failed).
 - **FR-007**: Tools MUST be covered by unit tests validating happy paths and at least one non-trivial edge case per tool (e.g., nested namespaces, overloaded functions, generics).
-- **FR-008**: Tools MUST allow a dry-run mode where suggestions are reported but not written to files.
-- **FR-009**: Tools MUST allow an explicit apply mode that writes JSDoc changes to files and creates a concise git-style patch for review.
+- **FR-008**: Tools MUST allow a dry-run mode where suggestions are reported but not written to files. In dry-run mode:
+  - All existing JSDoc blocks remain untouched
+  - A report is generated showing proposed changes
+  - Git-style patch output shows exact changes that would be made
+  - No filesystem modifications occur
+
+- **FR-009**: Tools MUST allow an explicit apply mode that writes JSDoc changes to files and creates a concise git-style patch for review. In apply mode:
+  - Existing high-quality JSDoc blocks (meeting format/content standards) are preserved
+  - Low-quality or outdated JSDoc blocks are replaced with generated ones
+  - Missing JSDoc blocks are added
+  - A backup of modified files is created before changes
+  - A git-style patch is generated showing applied changes
 - **FR-010**: The project MUST include prompt templates for each AST object type (classes, functions, types, interfaces, modules, namespaces, decorators, constants, enums, CLI modules) used by TOOL2; templates MUST be versioned and testable.
 
 *Notes on unclear aspects:*
