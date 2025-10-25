@@ -1,122 +1,87 @@
----
+# Tasks for Feature: MCP Module Structure Enforcement
 
-description: "Task list for MCP Module Structure Enforcement"
+Feature dir: `specs/001-mcp-module-structure`
 
----
+Overview: Implement structural validation and aggregation of module assets (prompts/resources/templates/tools) and expose them from the MCP server. Tasks are organized by phase and user story per speckit rules.
 
-# Tasks: MCP Module Structure Enforcement
+PHASE 1 — Setup
 
-**Input**: Design documents from `/specs/001-mcp-module-structure/`
-**Prerequisites**: plan.md (required), spec.md (required), research.md, data-model.md, contracts/, quickstart.md
+- [ ] T001 Create feature task list file `specs/001-mcp-module-structure/tasks.md`
+- [ ] T002 Initialize project-level validation utilities at `src/mcp/validation/index.ts`
+- [ ] T003 [P] Add TypeScript types for module packages at `src/mcp/types.ts`
 
-**Tests**: User stories call out validation and FASTMCP integration checks. Dedicated Jest test tasks are included under each story.
+PHASE 2 — Foundational
 
-**Organization**: Tasks are grouped by user story to enable independent implementation and testing. All code updates stay under `src/` and tests under `tests/{unit,integration}` to preserve Template Fidelity.
+- [ ] T004 Add a CLI helper for module discovery at `src/mcp/cli/discover-modules.ts`
+- [ ] T005 Add unit-test harness configuration for module validation at `tests/unit/validate-modules.test.ts`
+- [ ] T006 [P] Add small README `specs/001-mcp-module-structure/README.md` documenting folder conventions used by tasks
 
-## Phase 1: Setup (Shared Infrastructure)
+PHASE 3 — User Story 1 (US1) - Standardize Module Scaffolding (Priority: P1)
 
-**Purpose**: Prepare fixtures and documentation scaffolding required across all stories.
+Tasks implement the scaffolding and validation routine that enforces every `src/modules/*` directory contains `prompts`, `resources`, `templates`, `tools` with typed index exports.
 
-- [ ] T001 Create module fixture documentation at `tests/fixtures/modules/README.md` describing how sample modules support validator and integration scenarios.
-- [ ] T002 Scaffold `tests/fixtures/modules/sample-module/{prompts,resources,templates,tools}/index.ts` with placeholder exports for use across unit and integration tests.
+- [ ] T007 [US1] Create validation module `src/mcp/validation/validateModules.ts` that:
+    - accepts a repo root or absolute `src/modules` path
+    - verifies each module folder contains the four required subfolders
+    - checks each subfolder exports an index (e.g. `index.ts`/`index.js`) that exports a typed array
+    - emits a structured Validation Report with missing folders, missing exports, empty lists and remediation hints
 
----
+- [ ] T008 [US1] Create typed placeholders scaffold generator `src/mcp/validation/scaffoldModule.ts` that:
+    - given a module name/path, creates `prompts`, `resources`, `templates`, `tools` with example `index.ts` exports and type-safe placeholder items
+    - returns the created file list
 
-## Phase 2: Foundational (Blocking Prerequisites)
+- [ ] T009 [US1] Add unit tests `tests/unit/validation-scaffold.test.ts` for the scaffolder (happy path and missing-folder path)
 
-**Purpose**: Shared typings and helpers that every user story depends on.
+- [ ] T010 [US1] Integrate validation into `npm run lint` and `npm run test:unit` by adding an npm script `validate-modules` in `package.json` and wiring it to run before tests (CI-friendly)
 
-- [ ] T003 Define shared `PromptAsset`, `ResourceAsset`, `TemplateAsset`, `ToolAsset`, and `ModuleExportPackage` interfaces in `src/types.ts` and re-export them via `src/index.ts`.
-- [ ] T004 Implement `listModuleFolders` and disabled-module filtering utilities in `src/utils/modulePaths.ts` to enumerate `src/modules/*`.
-- [ ] T005 Add Jest helper utilities at `tests/unit/__helpers__/moduleFixtures.ts` to load fixture modules and clean up temporary folders across suites.
+PHASE 4 — User Story 2 (US2) - Aggregate Module Assets into MCP Server (Priority: P2)
 
----
+Tasks implement aggregation that concatenates module exports into master lists, detects duplicates, and provides provenance metadata.
 
-## Phase 3: User Story 1 - Standardize Module Scaffolding (Priority: P1) 🎯 MVP
+- [ ] T011 [US2] Implement aggregator `src/mcp/aggregateModules.ts` that:
+    - imports each module's exported arrays (prompts, resources, templates, tools)
+    - concatenates them into master lists while attaching provenance { moduleName, modulePath }
+    - detects duplicate identifiers across modules, logs deterministic errors, and prevents duplicates from being registered
 
-**Goal**: Enforce the required `prompts/resources/templates/tools` folders for every module and fail CI when structure drifts.
+- [ ] T012 [US2] Export aggregated master lists from `src/mcp/index.ts` and ensure `esm/` and `lib/` outputs will include these lists after build
 
-**Independent Test**: Run the module validation command against a real or fixture module and confirm it reports missing folders/exports before the module can ship.
+- [ ] T013 [US2] Add integration test `tests/integration/mcp-aggregation.test.ts` that mounts a test MCP instance, injects two sample modules, and verifies the aggregated arrays include all items exactly once and that duplication handling is exercised
 
-### Tests for User Story 1 ⚠️
+- [ ] T014 [US2] Add logging/reporting for aggregation conflicts to `src/mcp/validation/reporters.ts` and include an optional JSON output mode for CI consumers
 
-- [ ] T010 [US1] Add Jest unit coverage in `tests/unit/moduleValidator.test.ts` to assert the validator passes compliant modules and fails cases with missing folders, empty exports, or disabled flags.
+PHASE 5 — User Story 3 (US3) - LLM Receives Enriched Context (Priority: P3)
 
-### Implementation for User Story 1
+Tasks ensure FASTMCP sessions expose the consolidated assets and provenance metadata to clients.
 
-- [ ] T006 [US1] Implement `ModuleScaffoldingValidator` in `src/utils/moduleValidator.ts` to verify required folders exist and exports return typed arrays (with disabled-module handling).
-- [ ] T007 [US1] Add a CLI runner in `src/bin/validate-modules.ts`, expose it via a `validate:modules` npm script in `package.json`, and invoke it inside `npm run lint` and Jest setup.
-- [ ] T008 [P] [US1] Backfill `src/modules/decoration` with `prompts`, `resources`, `templates`, and `tools` subdirectories plus `index.ts` files exporting typed lists.
-- [ ] T009 [P] [US1] Backfill `src/modules/mcp` with the same four subdirectories and exports so it complies with the validator.
-- [ ] T011 [US1] Document the scaffolding rules in `README.md` and `workdocs/tutorials/ModuleStructure.md`, including instructions for creating placeholder assets and marking modules disabled.
+- [ ] T015 [US3] Wire aggregated lists into FASTMCP session initialization at `src/mcp/fastmcp-wiring.ts` (or the existing MCP server bootstrap file)
 
----
+- [ ] T016 [US3] Add an endpoint or capability manifest at `src/mcp/manifest.ts` that returns aggregated lists with provenance for clients (and unit tests at `tests/unit/manifest.test.ts`)
 
-## Phase 4: User Story 2 - Aggregate Module Assets into MCP Server (Priority: P2)
+- [ ] T017 [US3] Add an end-to-end test `tests/integration/mcp-e2e.test.ts` that simulates a FASTMCP client requesting the catalog and verifies provenance metadata is present and correct
 
-**Goal**: Replace hand-wired MCP lists with an automated registry that merges every module’s exports and blocks duplicates.
+PHASE 6 — Polish & Documentation
 
-**Independent Test**: Execute the integration test that boots the MCP layer with two fixture modules and verifies the aggregated arrays include each asset exactly once.
+- [ ] T018 Update repository README `Readme.md` and workdocs `workdocs/5-HowToUse.md` with instructions on adding a new module and the validation/aggregation behavior
+- [ ] T019 Add developer guide `docs/module-structure.md` outlining structure, types, and examples of placeholder exports
+- [ ] T020 [P] Run full test suite and capture coverage for the new modules; update CI scripts if needed to include validation step
 
-### Tests for User Story 2 ⚠️
+Dependencies & Execution Notes
 
-- [ ] T015 [US2] Add integration coverage in `tests/integration/mcp/moduleRegistry.int.test.ts` to confirm the registry loads multiple modules, surfaces provenance, and errors on duplicate IDs.
+- Phase 2 tasks T004-T006 must complete before US2 aggregator tests (T011-T013)
+- US1 validation (T007-T010) is a high priority and recommended as the MVP deliverable
+- Parallelizable tasks are labeled with [P]
 
-### Implementation for User Story 2
+Task counts & summary
 
-- [ ] T012 [US2] Build `ModuleRegistry` in `src/mcp/moduleRegistry.ts` to import every module’s exports, attach provenance metadata, and expose `listPrompts/resources/templates/tools`.
-- [ ] T013 [US2] Update `src/mcp/prompts/index.ts`, `src/mcp/resources/index.ts`, `src/mcp/templates/index.ts`, and `src/mcp/tools/index.ts` to re-export the registry-provided arrays.
-- [ ] T014 [US2] Extend `src/mcp/moduleRegistry.ts` with duplicate-ID detection and structured error logging that halts startup when conflicts occur.
+- Total tasks: 20
+- Tasks per story/phase:
+  - Setup: 3 (T001-T003)
+  - Foundational: 3 (T004-T006)
+  - US1 (P1): 4 (T007-T010)
+  - US2 (P2): 4 (T011-T014)
+  - US3 (P3): 3 (T015-T017)
+  - Polish: 3 (T018-T020)
 
----
+MVP recommendation: Implement US1 (T007-T010) plus the TypeScript types (T003) and unit-tests (T005/T009) so the validation routine can run in CI and block malformed modules.
 
-## Phase 5: User Story 3 - LLM Receives Enriched Context (Priority: P3)
-
-**Goal**: Ensure FASTMCP clients automatically receive the aggregated catalog with provenance whenever they connect.
-
-**Independent Test**: Run an end-to-end FASTMCP manifest test that inspects the capability response and confirms all prompts/resources/templates/tools include module metadata.
-
-### Tests for User Story 3 ⚠️
-
-- [ ] T018 [US3] Create an end-to-end FASTMCP test at `tests/integration/mcp/fastmcpManifest.int.test.ts` that boots the server, connects a mock client, and asserts the manifest contains the aggregated catalog.
-
-### Implementation for User Story 3
-
-- [ ] T016 [US3] Update `src/mcp/index.ts` and `src/mcp/mcp-module.ts` so the exposed MCP capabilities return registry data plus provenance fields.
-- [ ] T017 [P] [US3] Extend session/workspace handling in `src/mcp/workspace.ts` and `src/mcp/code.ts` to broadcast the aggregated prompts/resources/templates/tools when assistants request context.
-- [ ] T019 [US3] Refresh `README.md` and `workdocs/tutorials/ModuleStructure.md` with instructions for consuming the enriched MCP catalog, disabling modules, and troubleshooting duplicate warnings.
-
----
-
-## Phase 6: Polish & Cross-Cutting Concerns
-
-**Purpose**: Final documentation, automation, and release readiness.
-
-- [ ] T020 Update `workdocs/tutorials/For Developers.md` and `specs/001-mcp-module-structure/quickstart.md` with the final validation + registry workflow.
-- [ ] T021 Regenerate documentation via `npm run docs` and commit changes under `docs/` so onboarding instructions match the new module processes.
-- [ ] T022 Run `npm run coverage`, `npm run test:dist`, and `npm run prepare-pr`, capturing updated reports under `workdocs/reports/data/` for reviewer verification.
-
----
-
-## Dependencies & Execution Order
-
-- **Setup (Phase 1)**: Must complete before creating validators or registries so tests have fixtures to consume.
-- **Foundational (Phase 2)**: Depends on Setup; provides typings/helpers required by all user stories.
-- **User Story 1 (Phase 3)**: Builds on Foundational so the validator can rely on shared types and fixtures. This story is the MVP and must ship before US2/US3.
-- **User Story 2 (Phase 4)**: Requires US1 to guarantee module outputs are consistent before aggregation. Independent once validator is stable.
-- **User Story 3 (Phase 5)**: Depends on US2’s registry outputs to expose enriched manifests.
-- **Polish (Phase 6)**: Runs after all user stories to finalize docs and validation commands.
-
-## Parallel Opportunities
-
-- In **US1**, tasks T008 and T009 modify separate module directories and can run in parallel after the validator (T006) lands.
-- In **US2**, once `ModuleRegistry` (T012) is implemented, documentation wiring (T013) and duplicate-handling refinements (T014) can proceed concurrently by different contributors.
-- In **US3**, provenance propagation (T016) and workspace broadcasting updates (T017) operate on different files, enabling parallel execution before the end-to-end manifest test (T018).
-
-## Implementation Strategy
-
-1. **MVP (US1)**: Complete Setup, Foundational, and all User Story 1 tasks to enforce module scaffolding and validation. Ship as soon as validator + docs are ready.
-2. **Incremental Delivery**:
-   - **Increment 2 (US2)**: Add the ModuleRegistry aggregation and integration tests so MCP hosts consume module exports automatically.
-   - **Increment 3 (US3)**: Expose the enriched catalog to FASTMCP clients and finalize user-facing documentation.
-3. **Polish**: Regenerate docs, run full test/coverage suites, and capture artifacts for reviewers prior to merge or release.
+Location of this file: `specs/001-mcp-module-structure/tasks.md`

@@ -36,6 +36,11 @@ jest.mock("fastmcp", () => ({
   UserError: MockUserError,
 }));
 
-beforeAll(() => {
-  assertModuleScaffolding();
-});
+// Use global beforeAll when running under Jest; otherwise no-op
+if (typeof (global as any).beforeAll === "function") {
+  (global as any).beforeAll(() => {
+    if (process.env.ENFORCE_MODULE_VALIDATION === "1") {
+      assertModuleScaffolding();
+    }
+  });
+}

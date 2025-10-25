@@ -38,6 +38,11 @@ TypeScript 5.8.x targeting Node.js ≥22: Follow standard conventions
 - group types as other interfaces in a types.ts file per folder;
 - group constants or enums in a constants.ts file per folder;
 - group decorators in a decorators.ts file per folder;
-- group pure/utilitarian functions in a utils.ts file per folder, or create a dedicated file per related functionality. Try to limit the export of these outside the package.
-- always import from the specific file, never from a folder or index file (exceptions for dependencies on other packages)
-- All classes, interfaces, constants and types should always be exported
+- always import from the specific file, never from a folder or index file (exceptions for dependencies on other packages);
+- prefer the usage of established design patters where applicable:
+  - Singleton (can be an anti-pattern. use with care);
+  - factory;
+  - observer;
+  - strategy;
+  - builder;
+  - etc;
