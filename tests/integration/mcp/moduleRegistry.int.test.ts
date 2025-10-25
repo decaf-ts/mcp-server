@@ -1,5 +1,5 @@
 import { describe, expect, it } from "@jest/globals";
-import { ModuleRegistry } from "../../../src/mcp/moduleRegistry";
+import { ModuleRegistry } from "../../../src/fastmcp/moduleRegistry";
 import type { ModuleExportPackage } from "../../../src/types";
 
 const basePackage: ModuleExportPackage = {

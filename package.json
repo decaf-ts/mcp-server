@@ -104,6 +104,7 @@
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@rollup/plugin-typescript": "^12.1.2",
     "@stylistic/eslint-plugin": "^4.2.0",
+    "@types/diff": "^7.0.2",
     "@types/jest": "^29.5.14",
     "clean-publish": "^5.1.0",
     "dpdm": "^3.14.0",
@@ -130,13 +131,13 @@
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.31.0"
   },
-  "peerDependencies": {},"license": "AGPL-3.0-only",
+  "license": "AGPL-3.0-only",
   "dependencies": {
-    "ts-morph": "^21.0.0",
-    "fastmcp": "latest",
     "@decaf-ts/cli": "latest",
     "@decaf-ts/decoration": "latest",
     "@decaf-ts/logging": "latest",
+    "fastmcp": "latest",
+    "ts-morph": "^21.0.0",
     "zod": "latest"
   }
 }

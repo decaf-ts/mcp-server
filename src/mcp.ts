@@ -197,7 +197,10 @@ export class McpServer {
     // Dynamically import fastmcp to avoid loading ESM node_modules at test parse time
     const fastmcp = await import("fastmcp");
     const FastMCP = fastmcp.FastMCP || (fastmcp as any).default || fastmcp;
-    this.server = new FastMCP({ name: this.name, version: this.version });
+    this.server = new FastMCP({
+      name: this.name,
+      version: this.version as any,
+    });
 
     // register queued items
     for (const t of this.queuedTools) {
@@ -244,3 +247,5 @@ export class McpServer {
 export function createServer(opts?: { name?: string; version?: string }) {
   return new McpServer(opts);
 }
+
+export { default } from "./fastmcp/index";

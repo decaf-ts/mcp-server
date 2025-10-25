@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import os from "os";
-import { EnrichCoreWithAggregation } from "../../src/mcp/fastmcp-wiring";
+import { EnrichCoreWithAggregation } from "../../src/fastmcp/fastmcp-wiring";
 
 class MockServer {
   prompts: any[] = [];

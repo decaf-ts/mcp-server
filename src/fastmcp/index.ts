@@ -1,4 +1,3 @@
-// ...existing code...
 import fs from "fs";
 import path from "path";
 import { PromptExport } from "../types";
@@ -158,3 +157,5 @@ export function enrich(server: any) {
     // ignore
   }
 }
+
+export default enrich;
