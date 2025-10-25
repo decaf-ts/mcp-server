@@ -80,11 +80,16 @@
 - [ ] T026 [US3] Add programmatic interface in /home/tvenceslau/local-workspace/decaf-ts/mcp-server/tools/ast-jsdoc-tools/src/index.ts
 - [ ] T027 [P] [US3] Create unit tests for object-level JSDoc in /home/tvenceslau/local-workspace/decaf-ts/mcp-server/tools/ast-jsdoc-tools/test/unit/object-jsdoc.test.ts
 
-### Phase 6: Polish
+### Phase 6: Polish and Performance Validation
 
 - [ ] T028 Add detailed API documentation in /home/tvenceslau/local-workspace/decaf-ts/mcp-server/tools/ast-jsdoc-tools/README.md
 - [ ] T029 Create example scripts in /home/tvenceslau/local-workspace/decaf-ts/mcp-server/tools/ast-jsdoc-tools/examples
-- [ ] T030 Add performance benchmarks in /home/tvenceslau/local-workspace/decaf-ts/mcp-server/tools/ast-jsdoc-tools/benchmarks
+- [ ] T030 Create performance benchmark suite in /home/tvenceslau/local-workspace/decaf-ts/mcp-server/tools/ast-jsdoc-tools/benchmarks/suite.ts
+- [ ] T031 [P] Add 50-file test repository in /home/tvenceslau/local-workspace/decaf-ts/mcp-server/tools/ast-jsdoc-tools/test/fixtures/perf-repo
+- [ ] T032 Implement JSDoc conflict detection in /home/tvenceslau/local-workspace/decaf-ts/mcp-server/tools/ast-jsdoc-tools/src/utils/conflict-detector.ts
+- [ ] T033 Add conflict resolution prompts to interactive mode in /home/tvenceslau/local-workspace/decaf-ts/mcp-server/tools/ast-jsdoc-tools/src/cli/interactive.ts
+- [ ] T034 [P] Add unit tests for heuristic rules in /home/tvenceslau/local-workspace/decaf-ts/mcp-server/tools/ast-jsdoc-tools/test/unit/heuristics.test.ts
+- [ ] T035 [P] Add unit tests for JSDoc templates in /home/tvenceslau/local-workspace/decaf-ts/mcp-server/tools/ast-jsdoc-tools/test/unit/templates.test.ts
 
 ## Dependencies
 
@@ -112,7 +117,7 @@ US3 (P3) → Requires TOOL2
 
 ## Task Summary
 
-- Total Tasks: 30
+- Total Tasks: 35
 - Tasks per Story:
   - Setup: 5 tasks
   - Foundational: 5 tasks
