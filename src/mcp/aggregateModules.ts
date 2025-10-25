@@ -80,7 +80,7 @@ async function loadArrayFromIndex(
           // - convert single quotes to double quotes
           // - quote unquoted object keys
           // - strip trailing commas
-          let normalized = arrText
+          const normalized = arrText
             // unify quotes in string literals
             .replace(/'(?:\\'|[^'])*'/g, (m) => m.replace(/'/g, '"'))
             // quote unquoted keys after { or ,
