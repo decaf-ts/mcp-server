@@ -1,4 +1,5 @@
 import { jest } from "@jest/globals";
+import { assertModuleScaffolding } from "../src/utils/moduleValidator";
 
 class MockUserError extends Error {
   constructor(message: string) {
@@ -34,3 +35,7 @@ jest.mock("fastmcp", () => ({
   FastMCP: MockFastMCP,
   UserError: MockUserError,
 }));
+
+beforeAll(() => {
+  assertModuleScaffolding();
+});

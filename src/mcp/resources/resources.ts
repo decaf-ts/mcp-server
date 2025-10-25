@@ -1,9 +1,25 @@
 import type { Resource } from "fastmcp";
+import type { ResourceAsset } from "../../types";
+import { moduleRegistry } from "../moduleRegistry";
 import { getWorkspaceRoot } from "../workspace";
 import {
   buildObjectPrompts,
   discoverDocPrompts,
 } from "../prompts/prompts";
+
+function toResource(asset: ResourceAsset): Resource<undefined> {
+  return {
+    name: asset.id,
+    uri: asset.uri,
+    description: asset.description ?? asset.title,
+    mimeType: asset.mimeType,
+    load: () => asset.load(),
+  };
+}
+
+function buildModuleResources(): Resource<undefined>[] {
+  return moduleRegistry.listResources().map(toResource);
+}
 
 export const resources: Resource<undefined>[] = [
   {
@@ -46,4 +62,5 @@ export const resources: Resource<undefined>[] = [
       };
     },
   },
+  ...buildModuleResources(),
 ];

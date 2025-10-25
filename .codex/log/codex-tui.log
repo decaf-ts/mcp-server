@@ -439,3 +439,1129 @@
 *** End Patch
 [2m2025-10-24T23:22:04.836365Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","nl -ba specs/001-mcp-module-structure/spec.md"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
 [2m2025-10-24T23:22:08.727000Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","nl -ba specs/001-mcp-module-structure/checklists/requirements.md"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:28:39.589635Z[0m [32m INFO[0m ToolCall: update_plan {"plan":[{"status":"in_progress","step":"Run setup-plan script and gather required template/context files"},{"status":"pending","step":"Fill implementation plan sections (technical context, constitution check) and conduct Phase 0 research outputs"},{"status":"pending","step":"Complete Phase 1 design artifacts (data model, contracts, quickstart, agent context) and report results"}]}
+[2m2025-10-24T23:28:42.454812Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc",".specify/scripts/bash/setup-plan.sh --json"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server","timeout_ms":120000}
+[2m2025-10-24T23:28:46.753359Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","cat /home/tvenceslau/local-workspace/decaf-ts/mcp-server/specs/001-mcp-module-structure/plan.md"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:29:32.425343Z[0m [32m INFO[0m ToolCall: apply_patch *** Begin Patch
+*** Update File: specs/001-mcp-module-structure/plan.md
+@@
+-# Implementation Plan: [FEATURE]
+-
+-**Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
+-**Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
++# Implementation Plan: MCP Module Structure Enforcement
++
++**Branch**: `001-mcp-module-structure` | **Date**: 2025-10-24 | **Spec**: `/home/tvenceslau/local-workspace/decaf-ts/mcp-server/specs/001-mcp-module-structure/spec.md`
++**Input**: Feature specification from `/specs/001-mcp-module-structure/spec.md`
+@@
+-## Summary
+-
+-[Extract from feature spec: primary requirement + technical approach from research]
++## Summary
++
++Guarantee every `src/modules/*` directory follows an identical structure (`prompts`, `resources`, `templates`, `tools`) with typed exports, add repository automation that validates those folders during lint/test, and extend the FASTMCP server under `src/mcp` to aggregate module exports (with provenance + deduplication) so connected coding assistants always receive an enriched Decaf TS catalog.
+@@
+-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
+-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
+-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
+-**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
+-**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
+-**Project Type**: [single/web/mobile - determines source structure]  
+-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
+-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
+-**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
++**Language/Version**: TypeScript 5.8.x targeting Node.js ≥22  
++**Primary Dependencies**: FASTMCP 3.20, @decaf-ts shared libs, internal scaffolding utilities  
++**Storage**: N/A (in-memory module registry only)  
++**Testing**: Jest (unit + integration) with `npm run test:unit`, `npm run test:all`, `npm run test:dist`  
++**Target Platform**: Node CLI/server environments (local dev, CI containers, FASTMCP clients)
++**Project Type**: Single-package CLI/server template  
++**Performance Goals**: MCP startup aggregates ≤20 modules in under 3 seconds; validation runs complete within 2 seconds per module set  
++**Constraints**: Must keep code in `src/`, exports consolidated via `src/index.ts`; no new runtime deps without maintainer review; validation must run inside existing scripts (lint/test)  
++**Scale/Scope**: Expect 5–20 modules initially with growth to dozens across template consumers
+@@
+-- **Template Fidelity**: Confirm the feature keeps TypeScript sources in `src/`, re-exports via `src/index.ts`, uses only `tests/{unit,integration,bundling}`, and documents any CLI or API contract shifts.
+-- **Dual-Target Distribution**: Show how `npm run build`, `npm run build:prod`, and `npm run test:dist` stay green; note updates required for both `lib/` (CJS/ESM) and `dist/` bundles.
+-- **Verification Discipline**: Detail the spec/test-first approach, identify which suites (`test:all`, `coverage`, integration) must change, and justify every mock by marking it as an integration scenario.
+-- **Documentation & Observability**: List the README, docs site, diagrams, or logging touchpoints that need updates so runtime guidance stays accurate.
+-- **Automation & Trusted Tooling**: Use the provided scripts (`do-install`, `prepare-pr`, `drawings`, `uml`, etc.); flag and mitigate any workflow that cannot rely on them.
++- **Template Fidelity**: New validation utilities will live under `src/utils` + `src/modules/*` without adding extra entry points; documentation updates (README + workdocs) will explain the enforced folder layout and MCP wiring.
++- **Dual-Target Distribution**: Aggregation/validation logic executes during builds, so `npm run build`, `npm run build:prod`, and `npm run test:dist` must be updated to import the shared registry; CI will block if bundles fail to include the canonical exports.
++- **Verification Discipline**: Introduce Jest unit suites covering the validator plus integration tests that spin up the MCP host with fixture modules; no mocks for module interactions—use real folder fixtures inside `tests/integration`.
++- **Documentation & Observability**: Update README, docs site, and workdocs tutorials describing module scaffolding, plus ensure MCP logging surfaces duplicate/disabled module info for assistant operators.
++- **Automation & Trusted Tooling**: Extend existing npm scripts (`lint`, `test:all`, `prepare-pr`) to invoke the validator; leverage `.specify` automation for plan/tasks and keep secrets isolated in existing token files. No custom shell outside repo scripts.
+@@
+-```text
+-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
+-src/
+-├── models/
+-├── services/
+-├── cli/
+-└── lib/
+-
+-tests/
+-├── contract/
+-├── integration/
+-└── unit/
+-
+-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
+-backend/
+-├── src/
+-│   ├── models/
+-│   ├── services/
+-│   └── api/
+-└── tests/
+-
+-frontend/
+-├── src/
+-│   ├── components/
+-│   ├── pages/
+-│   └── services/
+-└── tests/
+-
+-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
+-api/
+-└── [same as backend above]
+-
+-ios/ or android/
+-└── [platform-specific structure: feature modules, UI flows, platform tests]
+-```
+-
+-**Structure Decision**: [Document the selected structure and reference the real
+-directories captured above]
++```text
++src/
++├── mcp/                   # FASTMCP server composition + prompts/resources/templates/tools
++├── modules/               # Feature-specific submodules (decoration, mcp, future)
++│   ├── <module>/prompts/
++│   ├── <module>/resources/
++│   ├── <module>/templates/
++│   └── <module>/tools/
++├── utils/                 # Shared validators/helpers
++├── index.ts               # Public re-export surface
++└── ...
++
++tests/
++├── unit/                  # Validator + registries
++└── integration/           # MCP bootstrap + aggregation scenarios
++```
++
++**Structure Decision**: Single TypeScript package rooted at `src/` with tests under `tests/{unit,integration}`; new validation/aggregation code stays within these directories to honor template fidelity.
+*** End Patch
+[2m2025-10-24T23:29:49.326193Z[0m [32m INFO[0m ToolCall: apply_patch *** Begin Patch
+*** Add File: specs/001-mcp-module-structure/research.md
++# Research: MCP Module Structure Enforcement
++
++## Topic 1: Module Folder Validation Strategy
++- **Decision**: Build a `ModuleScaffoldingValidator` utility in `src/utils` that walks every `src/modules/<name>` directory, asserts the presence of `prompts|resources|templates|tools`, and verifies each folder exports a typed array that matches shared interfaces.
++- **Rationale**: Centralizing the checks keeps Template Fidelity enforceable and lets `npm run lint`/`npm run test:unit` fail fast with actionable errors before MCP code ever runs.
++- **Alternatives Considered**:
++  - *A. Manual code review checklist*: Too easy to miss; offers no automated guardrails.
++  - *B. Custom ESLint rule*: Would only statically inspect file names, not runtime exports; harder to maintain than a focused validator.
++
++## Topic 2: Aggregation & Deduplication Policy
++- **Decision**: Aggregate module exports through a `ModuleRegistry` that loads each module’s index, tags every item with provenance metadata, and rejects duplicates by emitting an error that lists both modules.
++- **Rationale**: FASTMCP clients need consistent catalogs; stopping on conflict protects downstream assistants from ambiguous instructions while still letting maintainers resolve the issue quickly.
++- **Alternatives Considered**:
++  - *A. Last-write-wins*: Silent overwrites would hide bugs and produce unstable MCP manifests.
++  - *B. Namespacing per module*: Would force assistants to understand module internals, weakening the “single catalog” goal.
++
++## Topic 3: Runtime Integration with NPM Scripts
++- **Decision**: Wire the validator into `npm run lint` (pre-test check) and `npm run test:unit` (as a Jest helper) so Template Fidelity violations block both developer feedback loops and CI, while `npm run prepare-pr` automatically reuses the same hooks.
++- **Rationale**: Keeps Automation & Trusted Tooling intact: no new scripts, predictable enforcement, and compatibility with existing CI workflows.
++- **Alternatives Considered**:
++  - *A. Custom pre-commit hook*: Would miss CI-only environments and duplicate tooling setup.
++  - *B. Post-build validation*: Fails too late, only after bundles are generated.
++
++## Topic 4: FASTMCP Exposure Format
++- **Decision**: Extend the MCP server composition to expose combined prompts/resources/templates/tools plus provenance via simple JSON lists so coding assistants immediately know which module produced each asset.
++- **Rationale**: Aligns with the spec’s enrichment requirement and FASTMCP’s expectation of declarative capability manifests; no protocol-level changes required.
++- **Alternatives Considered**:
++  - *A. Separate endpoints per module*: Adds discovery complexity for assistants.
++  - *B. Static manifest file*: Would require manual refreshes and drift from live modules.
+*** End Patch
+[2m2025-10-24T23:30:08.008243Z[0m [32m INFO[0m ToolCall: apply_patch *** Begin Patch
+*** Add File: specs/001-mcp-module-structure/data-model.md
++# Data Model: MCP Module Structure Enforcement
++
++## Entity: Module Export Package
++- **Description**: Represents one Decaf module’s contribution to the MCP server.
++- **Fields**:
++  - `name` (string, required): Folder name under `src/modules`.
++  - `status` (enum `active|disabled`, default `active`): Indicates whether the module should be aggregated.
++  - `prompts` (PromptAsset[]): Typed list exported from `<module>/prompts/index.ts`.
++  - `resources` (ResourceAsset[]): Typed list exported from `<module>/resources/index.ts`.
++  - `templates` (TemplateAsset[]): Typed list exported from `<module>/templates/index.ts`.
++  - `tools` (ToolAsset[]): Typed list exported from `<module>/tools/index.ts`.
++  - `version` (string, optional): Semantic version to surface in provenance.
++  - `lastUpdated` (ISO timestamp): Populated by the validator based on git metadata or file stats.
++- **Relationships**: Aggregated into `ModuleRegistry`; contributes assets to `Aggregate Catalog`.
++- **Validation Rules**:
++  - All four asset arrays MUST be defined; empty arrays require an explicit `status: "disabled"` flag.
++  - Asset identifiers (e.g., `id`, `name`) MUST be unique within the module to prevent local conflicts.
++
++## Entity: Asset (Prompt/Resource/Template/Tool)
++- **Description**: Generic structure for an MCP-exposed item.
++- **Fields**:
++  - `id` (string, required): Unique identifier across all modules.
++  - `title` (string, required): Human-readable name surfaced to assistants.
++  - `description` (string): Guidance for assistant usage.
++  - `payload` (object/string): Content (prompt text, resource URL, template body, tool metadata).
++  - `tags` (string[]): Optional grouping labels (e.g., `["decoration", "cli"]`).
++  - `module` (string, derived): Module provenance injected by the aggregator.
++- **Relationships**: Linked back to `Module Export Package` via `module`.
++- **Validation Rules**:
++  - `id` MUST be globally unique; duplicates trigger aggregation errors.
++  - `payload` MUST satisfy MCP schema requirements (e.g., tool definitions include handler metadata).
++
++## Entity: ModuleRegistry
++- **Description**: Runtime registry responsible for loading modules, running validation, and exposing aggregate catalogs.
++- **Fields**:
++  - `packages` (Module Export Package[]): Source of truth for loaded modules.
++  - `errors` (ValidationIssue[]): Collection of issues detected during scans.
++  - `catalog` (Aggregate Catalog): Computed property for MCP exposure.
++- **Relationships**: Consumed by MCP server bootstrap and validation scripts.
++- **Validation Rules**:
++  - Registry initialization MUST fail fast if `errors` contains any blocking issue.
++  - Provides helper methods (`listPrompts`, `listResources`, etc.) that always return provenance-enriched arrays.
++
++## Entity: ValidationIssue
++- **Description**: Structured problem emitted by the validator.
++- **Fields**:
++  - `type` (enum `missing-folder`, `missing-export`, `duplicate-id`, `empty-asset`, `runtime-failure`)
++  - `module` (string)
++  - `detail` (string)
++  - `severity` (enum `error|warning`)
++- **Relationships**: Referenced by ModuleRegistry; surfaced in CLI/log output.
++- **Validation Rules**:
++  - `severity=error` blocks builds/tests; `warning` allows continuation but logs guidance.
++
++## Entity: Aggregate Catalog
++- **Description**: The MCP-ready manifest of prompts/resources/templates/tools.
++- **Fields**:
++  - `prompts`, `resources`, `templates`, `tools` (each Asset[]): Combined and deduplicated arrays.
++  - `generatedAt` (ISO timestamp)
++  - `moduleCount` (number)
++  - `assetCounts` (object: { prompts, resources, templates, tools })
++- **Relationships**: Served by the MCP server to FASTMCP clients.
++- **Validation Rules**:
++  - All asset arrays MUST be sorted deterministically (e.g., by `module` then `id`) for reproducible builds.
++  - Catalog generation MUST fail if any arrays contain conflicting identifiers.
+*** End Patch
+[2m2025-10-24T23:30:29.154088Z[0m [32m INFO[0m ToolCall: apply_patch *** Begin Patch
+*** Add File: specs/001-mcp-module-structure/contracts/catalog.openapi.yaml
++openapi: 3.1.0
++info:
++  title: Decaf MCP Module Registry API
++  version: 1.0.0
++  description: >
++    Contract documenting the internal HTTP/IPC surface used by the FASTMCP server
++    (or diagnostics harness) to inspect module scaffolding, trigger validation,
++    and fetch the enriched asset catalog that assistants consume.
++servers:
++  - url: http://localhost:7337
++    description: Local FASTMCP developer preview
++paths:
++  /modules:
++    get:
++      summary: List all registered modules and their structural status
++      operationId: listModules
++      responses:
++        '200':
++          description: Successfully retrieved module metadata
++          content:
++            application/json:
++              schema:
++                type: object
++                properties:
++                  modules:
++                    type: array
++                    items:
++                      $ref: '#/components/schemas/ModulePackage'
++  /modules/{moduleName}/validate:
++    post:
++      summary: Run validation for a specific module
++      operationId: validateModule
++      parameters:
++        - name: moduleName
++          in: path
++          required: true
++          schema:
++            type: string
++      responses:
++        '200':
++          description: Validation completed
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/ValidationReport'
++        '404':
++          description: Module not found
++  /mcp/catalog:
++    get:
++      summary: Fetch the aggregate MCP asset catalog
++      operationId: getCatalog
++      responses:
++        '200':
++          description: Aggregated prompts, resources, templates, and tools
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/AggregateCatalog'
++components:
++  schemas:
++    ModulePackage:
++      type: object
++      required:
++        - name
++        - status
++        - prompts
++        - resources
++        - templates
++        - tools
++      properties:
++        name:
++          type: string
++        status:
++          type: string
++          enum: [active, disabled]
++        version:
++          type: string
++        prompts:
++          type: array
++          items:
++            $ref: '#/components/schemas/Asset'
++        resources:
++          type: array
++          items:
++            $ref: '#/components/schemas/Asset'
++        templates:
++          type: array
++          items:
++            $ref: '#/components/schemas/Asset'
++        tools:
++          type: array
++          items:
++            $ref: '#/components/schemas/Asset'
++    ValidationReport:
++      type: object
++      properties:
++        module:
++          type: string
++        issues:
++          type: array
++          items:
++            $ref: '#/components/schemas/ValidationIssue'
++        passed:
++          type: boolean
++    ValidationIssue:
++      type: object
++      required:
++        - type
++        - detail
++        - severity
++      properties:
++        type:
++          type: string
++          enum: [missing-folder, missing-export, duplicate-id, empty-asset, runtime-failure]
++        detail:
++          type: string
++        severity:
++          type: string
++          enum: [error, warning]
++    AggregateCatalog:
++      type: object
++      properties:
++        moduleCount:
++          type: integer
++        generatedAt:
++          type: string
++          format: date-time
++        prompts:
++          type: array
++          items:
++            $ref: '#/components/schemas/Asset'
++        resources:
++          type: array
++          items:
++            $ref: '#/components/schemas/Asset'
++        templates:
++          type: array
++          items:
++            $ref: '#/components/schemas/Asset'
++        tools:
++          type: array
++          items:
++            $ref: '#/components/schemas/Asset'
++    Asset:
++      type: object
++      required:
++        - id
++        - title
++        - module
++      properties:
++        id:
++          type: string
++        title:
++          type: string
++        description:
++          type: string
++        payload:
++          type: object
++        tags:
++          type: array
++          items:
++            type: string
++        module:
++          type: string
+*** End Patch
+[2m2025-10-24T23:30:41.544608Z[0m [32m INFO[0m ToolCall: apply_patch *** Begin Patch
+*** Add File: specs/001-mcp-module-structure/quickstart.md
++# Quickstart: MCP Module Structure Enforcement
++
++## 1. Prepare Environment
++1. Ensure Node.js ≥22 and npm ≥10.
++2. Install dependencies with `npm run do-install` (loads tokens automatically when needed).
++3. Run `npm run lint` once to confirm the current branch is clean before modifying scaffolding.
++
++## 2. Standardize Module Layout
++1. For each directory under `src/modules/<name>`:
++   - Create `prompts`, `resources`, `templates`, and `tools` subfolders with `index.ts` files that export typed arrays.
++   - Add an `index.ts` at the module root to re-export the four lists plus module metadata.
++2. Add placeholder entries if a list would otherwise be empty; validators treat a module with empty exports as disabled unless flagged explicitly.
++
++## 3. Implement Validation Utility
++1. Build `ModuleScaffoldingValidator` (e.g., `src/utils/moduleValidator.ts`) that:
++   - Walks module directories via Node FS.
++   - Confirms each required folder exists.
++   - Imports each module’s index to verify exports match shared interfaces.
++   - Emits structured `ValidationIssue`s for missing folders, exports, or duplicate IDs.
++2. Wire the validator into `npm run lint` (pre-lint hook) and the Jest setup file so unit tests fail fast on structural drift.
++
++## 4. Aggregate Assets in MCP Server
++1. Add a `ModuleRegistry` that loads every module export and decorates entries with provenance metadata.
++2. Update `src/mcp` lists (prompts/resources/templates/tools) to import from the registry instead of hand-curated arrays.
++3. Ensure duplicate IDs throw descriptive errors and disabled modules are skipped.
++
++## 5. Update Documentation & Tooling
++1. Refresh README/workdocs to explain how to add a new module and how validation behaves.
++2. Regenerate docs if CLI surface or module onboarding instructions change: `npm run docs`.
++3. Run `npm run test:dist`, `npm run build`, and `npm run build:prod` to ensure Dual-Target Distribution remains healthy.
++
++## 6. Validation Before PR
++1. Execute `npm run lint`, `npm run test:all`, `npm run coverage`, and `npm run prepare-pr`.
++2. Attach validator output (or confirmation) plus updated docs to the pull request.
+*** End Patch
+[2m2025-10-24T23:30:47.085022Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc",".specify/scripts/bash/update-agent-context.sh codex"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server","timeout_ms":120000}
+[2m2025-10-24T23:30:50.461577Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","cat AGENTS.md"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:30:58.952705Z[0m [32m INFO[0m ToolCall: apply_patch *** Begin Patch
+*** Update File: specs/001-mcp-module-structure/plan.md
+@@
+ - **Documentation & Observability**: Update README, docs site, and workdocs tutorials describing module scaffolding, plus ensure MCP logging surfaces duplicate/disabled module info for assistant operators.
+ - **Automation & Trusted Tooling**: Extend existing npm scripts (`lint`, `test:all`, `prepare-pr`) to invoke the validator; leverage `.specify` automation for plan/tasks and keep secrets isolated in existing token files. No custom shell outside repo scripts.
++
++**Gate Evaluation**: All principles can be satisfied with the design above; no violations anticipated, so Complexity Tracking remains empty. Re-evaluate after Phase 1 deliverables to confirm tooling/documentation updates stay aligned.
+*** End Patch
+[2m2025-10-24T23:31:07.455409Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","nl -ba specs/001-mcp-module-structure/plan.md"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:31:12.678457Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","nl -ba specs/001-mcp-module-structure/research.md"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:31:16.669256Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","nl -ba specs/001-mcp-module-structure/data-model.md"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:31:20.769063Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","nl -ba specs/001-mcp-module-structure/quickstart.md"] ,"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:31:24.922475Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","nl -ba specs/001-mcp-module-structure/contracts/catalog.openapi.yaml"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:31:59.779951Z[0m [32m INFO[0m ToolCall: update_plan {"plan":[{"status":"in_progress","step":"Run prerequisite script, gather feature directory, and load existing plan/spec docs"},{"status":"pending","step":"Derive tasks per phase/story using template rules and contextual documents"},{"status":"pending","step":"Write tasks.md, validate format/counts, and summarize results"}]}
+[2m2025-10-24T23:32:02.977803Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc",".specify/scripts/bash/check-prerequisites.sh --json"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server","timeout_ms":120000}
+[2m2025-10-24T23:32:06.543493Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","cat /home/tvenceslau/local-workspace/decaf-ts/mcp-server/specs/001-mcp-module-structure/plan.md"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:32:10.229987Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","cat /home/tvenceslau/local-workspace/decaf-ts/mcp-server/specs/001-mcp-module-structure/spec.md"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:32:15.246074Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","cat /home/tvenceslau/local-workspace/decaf-ts/mcp-server/specs/001-mcp-module-structure/research.md"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:32:20.926525Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","cat /home/tvenceslau/local-workspace/decaf-ts/mcp-server/specs/001-mcp-module-structure/data-model.md"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:34:53.704063Z[0m [32m INFO[0m ToolCall: apply_patch *** Begin Patch
+*** Add File: specs/001-mcp-module-structure/tasks.md
++---
++
++description: "Task list for MCP Module Structure Enforcement"
++
++---
++
++# Tasks: MCP Module Structure Enforcement
++
++**Input**: Design documents from `/specs/001-mcp-module-structure/`
++**Prerequisites**: plan.md (required), spec.md (required), research.md, data-model.md, contracts/, quickstart.md
++
++**Tests**: User stories call out validation and FASTMCP integration checks. Dedicated Jest test tasks are included under each story.
++
++**Organization**: Tasks are grouped by user story to enable independent implementation and testing. All code updates stay under `src/` and tests under `tests/{unit,integration}` to preserve Template Fidelity.
++
++## Phase 1: Setup (Shared Infrastructure)
++
++**Purpose**: Prepare fixtures and documentation scaffolding required across all stories.
++
++- [ ] T001 Create module fixture documentation at `tests/fixtures/modules/README.md` describing how sample modules support validator and integration scenarios.
++- [ ] T002 Scaffold `tests/fixtures/modules/sample-module/{prompts,resources,templates,tools}/index.ts` with placeholder exports for use across unit and integration tests.
++
++---
++
++## Phase 2: Foundational (Blocking Prerequisites)
++
++**Purpose**: Shared typings and helpers that every user story depends on.
++
++- [ ] T003 Define shared `PromptAsset`, `ResourceAsset`, `TemplateAsset`, `ToolAsset`, and `ModuleExportPackage` interfaces in `src/types.ts` and re-export them via `src/index.ts`.
++- [ ] T004 Implement `listModuleFolders` and disabled-module filtering utilities in `src/utils/modulePaths.ts` to enumerate `src/modules/*`.
++- [ ] T005 Add Jest helper utilities at `tests/unit/__helpers__/moduleFixtures.ts` to load fixture modules and clean up temporary folders across suites.
++
++---
++
++## Phase 3: User Story 1 - Standardize Module Scaffolding (Priority: P1) 🎯 MVP
++
++**Goal**: Enforce the required `prompts/resources/templates/tools` folders for every module and fail CI when structure drifts.
++
++**Independent Test**: Run the module validation command against a real or fixture module and confirm it reports missing folders/exports before the module can ship.
++
++### Tests for User Story 1 ⚠️
++
++- [ ] T010 [US1] Add Jest unit coverage in `tests/unit/moduleValidator.test.ts` to assert the validator passes compliant modules and fails cases with missing folders, empty exports, or disabled flags.
++
++### Implementation for User Story 1
++
++- [ ] T006 [US1] Implement `ModuleScaffoldingValidator` in `src/utils/moduleValidator.ts` to verify required folders exist and exports return typed arrays (with disabled-module handling).
++- [ ] T007 [US1] Add a CLI runner in `src/bin/validate-modules.ts`, expose it via a `validate:modules` npm script in `package.json`, and invoke it inside `npm run lint` and Jest setup.
++- [ ] T008 [P] [US1] Backfill `src/modules/decoration` with `prompts`, `resources`, `templates`, and `tools` subdirectories plus `index.ts` files exporting typed lists.
++- [ ] T009 [P] [US1] Backfill `src/modules/mcp` with the same four subdirectories and exports so it complies with the validator.
++- [ ] T011 [US1] Document the scaffolding rules in `README.md` and `workdocs/tutorials/ModuleStructure.md`, including instructions for creating placeholder assets and marking modules disabled.
++
++---
++
++## Phase 4: User Story 2 - Aggregate Module Assets into MCP Server (Priority: P2)
++
++**Goal**: Replace hand-wired MCP lists with an automated registry that merges every module’s exports and blocks duplicates.
++
++**Independent Test**: Execute the integration test that boots the MCP layer with two fixture modules and verifies the aggregated arrays include each asset exactly once.
++
++### Tests for User Story 2 ⚠️
++
++- [ ] T015 [US2] Add integration coverage in `tests/integration/mcp/moduleRegistry.int.test.ts` to confirm the registry loads multiple modules, surfaces provenance, and errors on duplicate IDs.
++
++### Implementation for User Story 2
++
++- [ ] T012 [US2] Build `ModuleRegistry` in `src/mcp/moduleRegistry.ts` to import every module’s exports, attach provenance metadata, and expose `listPrompts/resources/templates/tools`.
++- [ ] T013 [US2] Update `src/mcp/prompts/index.ts`, `src/mcp/resources/index.ts`, `src/mcp/templates/index.ts`, and `src/mcp/tools/index.ts` to re-export the registry-provided arrays.
++- [ ] T014 [US2] Extend `src/mcp/moduleRegistry.ts` with duplicate-ID detection and structured error logging that halts startup when conflicts occur.
++
++---
++
++## Phase 5: User Story 3 - LLM Receives Enriched Context (Priority: P3)
++
++**Goal**: Ensure FASTMCP clients automatically receive the aggregated catalog with provenance whenever they connect.
++
++**Independent Test**: Run an end-to-end FASTMCP manifest test that inspects the capability response and confirms all prompts/resources/templates/tools include module metadata.
++
++### Tests for User Story 3 ⚠️
++
++- [ ] T018 [US3] Create an end-to-end FASTMCP test at `tests/integration/mcp/fastmcpManifest.int.test.ts` that boots the server, connects a mock client, and asserts the manifest contains the aggregated catalog.
++
++### Implementation for User Story 3
++
++- [ ] T016 [US3] Update `src/mcp/index.ts` and `src/mcp/mcp-module.ts` so the exposed MCP capabilities return registry data plus provenance fields.
++- [ ] T017 [P] [US3] Extend session/workspace handling in `src/mcp/workspace.ts` and `src/mcp/code.ts` to broadcast the aggregated prompts/resources/templates/tools when assistants request context.
++- [ ] T019 [US3] Refresh `README.md` and `workdocs/tutorials/ModuleStructure.md` with instructions for consuming the enriched MCP catalog, disabling modules, and troubleshooting duplicate warnings.
++
++---
++
++## Phase 6: Polish & Cross-Cutting Concerns
++
++**Purpose**: Final documentation, automation, and release readiness.
++
++- [ ] T020 Update `workdocs/tutorials/For Developers.md` and `specs/001-mcp-module-structure/quickstart.md` with the final validation + registry workflow.
++- [ ] T021 Regenerate documentation via `npm run docs` and commit changes under `docs/` so onboarding instructions match the new module processes.
++- [ ] T022 Run `npm run coverage`, `npm run test:dist`, and `npm run prepare-pr`, capturing updated reports under `workdocs/reports/data/` for reviewer verification.
++
++---
++
++## Dependencies & Execution Order
++
++- **Setup (Phase 1)**: Must complete before creating validators or registries so tests have fixtures to consume.
++- **Foundational (Phase 2)**: Depends on Setup; provides typings/helpers required by all user stories.
++- **User Story 1 (Phase 3)**: Builds on Foundational so the validator can rely on shared types and fixtures. This story is the MVP and must ship before US2/US3.
++- **User Story 2 (Phase 4)**: Requires US1 to guarantee module outputs are consistent before aggregation. Independent once validator is stable.
++- **User Story 3 (Phase 5)**: Depends on US2’s registry outputs to expose enriched manifests.
++- **Polish (Phase 6)**: Runs after all user stories to finalize docs and validation commands.
++
++## Parallel Opportunities
++
++- In **US1**, tasks T008 and T009 modify separate module directories and can run in parallel after the validator (T006) lands.
++- In **US2**, once `ModuleRegistry` (T012) is implemented, documentation wiring (T013) and duplicate-handling refinements (T014) can proceed concurrently by different contributors.
++- In **US3**, provenance propagation (T016) and workspace broadcasting updates (T017) operate on different files, enabling parallel execution before the end-to-end manifest test (T018).
++
++## Implementation Strategy
++
++1. **MVP (US1)**: Complete Setup, Foundational, and all User Story 1 tasks to enforce module scaffolding and validation. Ship as soon as validator + docs are ready.
++2. **Incremental Delivery**:
++   - **Increment 2 (US2)**: Add the ModuleRegistry aggregation and integration tests so MCP hosts consume module exports automatically.
++   - **Increment 3 (US3)**: Expose the enriched catalog to FASTMCP clients and finalize user-facing documentation.
++3. **Polish**: Regenerate docs, run full test/coverage suites, and capture artifacts for reviewers prior to merge or release.
+*** End Patch
+[2m2025-10-24T23:38:49.383012Z[0m [32m INFO[0m ToolCall: update_plan {"plan":[{"status":"in_progress","step":"Baseline and prepare fixtures/infrastructure (Phases 1-2)"},{"status":"pending","step":"Implement User Story 1 (validator + documentation)"},{"status":"pending","step":"Implement User Story 2 (ModuleRegistry aggregation)"},{"status":"pending","step":"Implement User Story 3 (FASTMCP exposure)"},{"status":"pending","step":"Polish: docs regen, scripts, final validation"}]}
+[2m2025-10-24T23:38:53.786832Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","ls src/modules"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:38:59.212072Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","ls tests"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:39:05.977204Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","sed -n '1,200p' src/types.ts"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:39:10.476086Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","find src/modules -maxdepth 2 -type f | head"]}
+[2m2025-10-24T23:39:14.884323Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","ls src/mcp"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:39:20.715762Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","ls src/mcp/prompts"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:39:25.835970Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","sed -n '1,160p' src/mcp/prompts/index.ts"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:39:30.343193Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","sed -n '1,200p' src/mcp/prompts/prompts.ts"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:39:50.003705Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","rg -n \"Tool\" src/mcp -g\"*.ts\""]}
+[2m2025-10-24T23:40:03.827659Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","ls src/mcp/resources"]}
+[2m2025-10-24T23:40:09.050657Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","sed -n '1,200p' src/mcp/resources/resources.ts"]}
+[2m2025-10-24T23:40:34.550924Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","ls tests/unit"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:40:52.159640Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","mkdir -p tests/fixtures/modules/sample-module/{prompts,resources,templates,tools}"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:40:59.944817Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","cat <<'EOF' > tests/fixtures/modules/README.md\n# Module Fixtures\n\nThese fixtures simulate Decaf MCP modules so validator and integration tests can operate on real directory structures without mutating `src/modules/*`.\n\n```\nmodules/\n  sample-module/\n    prompts/\n    resources/\n    templates/\n    tools/\n```\n\nEach folder exports typed asset lists that the validator and module registry can import during tests. Add more fixture modules here whenever a scenario requires conflicting IDs, disabled assets, or other edge cases.\nEOF"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:41:10.593606Z[0m [32m INFO[0m ToolCall: apply_patch *** Begin Patch
+*** Update File: src/types.ts
+@@
+-import { FastMCP } from "fastmcp";
++import type { ContentResult, Tool } from "fastmcp";
+ 
+ /**
+  * @description Function type for Decaf MCP modules
+@@
+ export type McpModule = {
+   enrich(mcp: FastMCP): FastMCP | Promise<FastMCP>;
+   PACKAGE_NAME: string;
+   VERSION: string;
+ };
++
++export type ModuleStatus = "active" | "disabled";
++
++export interface BaseAsset {
++  id: string;
++  title: string;
++  description?: string;
++  tags?: string[];
++  provenance?: string;
++}
++
++export interface PromptAsset extends BaseAsset {
++  load: () => Promise<string> | string;
++}
++
++export interface ResourceAsset extends BaseAsset {
++  uri: string;
++  mimeType: string;
++  load: () => Promise<ContentResult> | ContentResult;
++}
++
++export interface TemplateAsset extends BaseAsset {
++  content: string;
++  placeholders?: string[];
++}
++
++export interface ToolAsset extends BaseAsset {
++  tool: Tool<unknown, unknown>;
++}
++
++export interface ModuleExportPackage {
++  name: string;
++  status?: ModuleStatus;
++  version?: string;
++  lastUpdated?: string;
++  prompts: PromptAsset[];
++  resources: ResourceAsset[];
++  templates: TemplateAsset[];
++  tools: ToolAsset[];
++}
++
++export type ValidationIssueType =
++  | "missing-folder"
++  | "missing-export"
++  | "duplicate-id"
++  | "empty-asset"
++  | "runtime-failure";
++
++export interface ValidationIssue {
++  type: ValidationIssueType;
++  module: string;
++  detail: string;
++  severity: "error" | "warning";
++}
+*** End Patch
+[2m2025-10-24T23:41:17.458331Z[0m [32m INFO[0m ToolCall: apply_patch *** Begin Patch
+*** Update File: src/types.ts
+@@
+-import type { ContentResult, Tool } from "fastmcp";
++import type { ContentResult, FastMCP, Tool } from "fastmcp";
+*** End Patch
+[2m2025-10-24T23:41:23.292196Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","sed -n '1,200p' src/index.ts"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:41:31.586219Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","cat <<'EOF' > tests/fixtures/modules/sample-module/prompts/index.ts\nimport type { PromptAsset } from \"../../../../src/types\";\n\nexport const prompts: PromptAsset[] = [\n  {\n    id: \"sample-module.prompt.overview\",\n    title: \"Sample Module Overview\",\n    description: \"Explains how the sample module contributes prompts during tests.\",\n    load: () => \"Sample prompt content\",\n  },\n];\nEOF"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:41:37.934116Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","cat <<'EOF' > tests/fixtures/modules/sample-module/resources/index.ts\nimport type { ResourceAsset } from \"../../../../src/types\";\n\nexport const resources: ResourceAsset[] = [\n  {\n    id: \"sample-module.resource.readme\",\n    title: \"Sample Module README\",\n    uri: \"fixture://sample-module/README\",\n    mimeType: \"text/markdown\",\n    load: () => ({\n      text: \"Sample module resource content\",\n      mimeType: \"text/markdown\",\n    }),\n  },\n];\nEOF"]}
+[2m2025-10-24T23:41:43.841698Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","cat <<'EOF' > tests/fixtures/modules/sample-module/templates/index.ts\nimport type { TemplateAsset } from \"../../../../src/types\";\n\nexport const templates: TemplateAsset[] = [\n  {\n    id: \"sample-module.template.scaffold\",\n    title: \"Sample Scaffolding Template\",\n    description: \"Provides boilerplate text for module scaffolding tests.\",\n    content: \"Sample template with {{placeholder}}\",\n    placeholders: [\"placeholder\"],\n  },\n];\nEOF"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:41:54.221237Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","cat <<'EOF' > tests/fixtures/modules/sample-module/tools/index.ts\nimport type { Tool } from \"fastmcp\";\nimport type { ToolAsset } from \"../../../../src/types\";\n\nconst sampleTool: Tool<undefined, undefined> = {\n  name: \"sample-module.tool.echo\",\n  description: \"Echoes the provided message for testing.\",\n  inputSchema: {\n    type: \"object\",\n    properties: {\n      message: {\n        type: \"string\",\n      },\n    },\n    required: [\"message\"],\n  },\n  outputSchema: {\n    type: \"object\",\n    properties: {\n      echoed: {\n        type: \"string\",\n      },\n    },\n  },\n  handler: async (args: { message: string }) => ({\n    content: {\n      type: \"text\",\n      text: `echo:${args.message}`,\n    },\n  }),\n};\n\nexport const tools: ToolAsset[] = [\n  {\n    id: \"sample-module.tool.echo\",\n    title: \"Sample Echo Tool\",\n    description: \"Test tool ensuring module tool exports are wired correctly.\",\n    tool: sampleTool,\n  },\n];\nEOF"]}
+[2m2025-10-24T23:42:00.464016Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","sed -n '1,120p' src/utils.ts"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:42:18.000020Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","sed -n '1,160p' src/mcp/workspace.ts"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:42:30.363154Z[0m [32m INFO[0m ToolCall: apply_patch *** Begin Patch
+*** Add File: src/utils/modulePaths.ts
++import fs from "node:fs";
++import path from "node:path";
++import { getWorkspaceRoot } from "../mcp/workspace";
++
++export const REQUIRED_MODULE_FOLDERS = [
++  "prompts",
++  "resources",
++  "templates",
++  "tools",
++] as const;
++
++export type ModuleFolder = (typeof REQUIRED_MODULE_FOLDERS)[number];
++
++export function resolveModulesRoot(workspaceRoot = getWorkspaceRoot()): string {
++  return path.resolve(workspaceRoot, "src/modules");
++}
++
++export function listModuleDirectories(workspaceRoot = getWorkspaceRoot()): string[] {
++  const root = resolveModulesRoot(workspaceRoot);
++  if (!fs.existsSync(root)) return [];
++
++  return fs
++    .readdirSync(root)
++    .map((entry) => ({
++      entry,
++      absolute: path.join(root, entry),
++    }))
++    .filter(({ absolute }) => fs.statSync(absolute).isDirectory())
++    .map(({ entry }) => entry)
++    .sort();
++}
++
++export function resolveModulePath(
++  moduleName: string,
++  workspaceRoot = getWorkspaceRoot()
++): string {
++  return path.join(resolveModulesRoot(workspaceRoot), moduleName);
++}
++
++export function resolveModuleFolderPath(
++  moduleName: string,
++  folder: ModuleFolder,
++  workspaceRoot = getWorkspaceRoot()
++): string {
++  return path.join(resolveModulePath(moduleName, workspaceRoot), folder);
++}
+*** End Patch
+[2m2025-10-24T23:42:40.910791Z[0m [32m INFO[0m ToolCall: apply_patch *** Begin Patch
+*** Update File: src/utils.ts
+@@
+ export class McpUtils {
+@@
+   static packageName(basePath: string): string {
+     const name = (McpUtils.getPackage(basePath)["name"] as string).split("/");
+     return name[name.length - 1];
+   }
+ }
++
++export * from "./utils/modulePaths";
+*** End Patch
+[2m2025-10-24T23:42:54.021058Z[0m [32m INFO[0m ToolCall: apply_patch *** Begin Patch
+*** Add File: tests/unit/__helpers__/moduleFixtures.ts
++import fs from "node:fs";
++import os from "node:os";
++import path from "node:path";
++
++const FIXTURE_ROOT = path.resolve(__dirname, "../../fixtures/modules");
++
++export function createTempModulesRoot(): string {
++  return fs.mkdtempSync(path.join(os.tmpdir(), "decaf-modules-"));
++}
++
++export function copyFixtureModule(
++  targetRoot: string,
++  fixtureName: string
++): string {
++  const source = path.join(FIXTURE_ROOT, fixtureName);
++  if (!fs.existsSync(source)) {
++    throw new Error(`Fixture ${fixtureName} does not exist at ${source}`);
++  }
++  const destination = path.join(targetRoot, fixtureName);
++  fs.cpSync(source, destination, { recursive: true });
++  return destination;
++}
++
++export function removeTempModulesRoot(root: string) {
++  if (fs.existsSync(root)) {
++    fs.rmSync(root, { recursive: true, force: true });
++  }
++}
+*** End Patch
+[2m2025-10-24T23:43:48.801465Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","rg -n \"modules/decoration\" -n src -n tests"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:43:53.824437Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","rg -n \"decoration\" src/modules -n"]}
+[2m2025-10-24T23:44:05.187095Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","ls src/mcp/templates"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:44:10.123607Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","sed -n '1,200p' src/mcp/templates/index.ts"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:44:17.098126Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","sed -n '1,160p' src/mcp/templates/resource-templates.ts"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:44:21.688340Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","sed -n '1,200p' src/mcp/types.ts"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:46:07.760298Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","cat jest.config.ts"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:46:14.390686Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","cat tests/setup.ts"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:46:28.449344Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","mkdir -p src/modules/decoration/{prompts,resources,templates,tools} src/modules/mcp/{prompts,resources,templates,tools}"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:46:37.457824Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","cat <<'EOF' > src/modules/decoration/prompts/index.ts\nimport path from \"node:path\";\nimport { readWorkspaceFile, getWorkspaceRoot } from \"../../../mcp/workspace\";\nimport type { PromptAsset } from \"../../../types\";\n\nexport const prompts: PromptAsset[] = [\n  {\n    id: \"decoration.prompt.guide\",\n    title: \"Decoration Module Overview\",\n    description:\n      \"Summarizes the decoration helpers available in Decaf projects for quick onboarding.\",\n    load: async () => {\n      const root = getWorkspaceRoot();\n      const content = await readWorkspaceFile(\n        root,\n        path.join(\"workdocs\", \"tutorials\", \"For Developers.md\")\n      );\n      return [\n        \"# Decoration Module Overview\",\n        \"\",\n        \"Use the decoration builders exported from @decaf-ts/decoration to extend CLI and server features.\",\n        \"Relevant onboarding excerpt:\",\n        content.slice(0, 1000),\n      ].join(\"\\n\");\n    },\n  },\n];\nEOF"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:46:44.932311Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","cat <<'EOF' > src/modules/decoration/resources/index.ts\nimport path from \"node:path\";\nimport { readWorkspaceFile, getWorkspaceRoot } from \"../../../mcp/workspace\";\nimport type { ResourceAsset } from \"../../../types\";\n\nexport const resources: ResourceAsset[] = [\n  {\n    id: \"decoration.resource.component-list\",\n    title: \"Decoration Components Reference\",\n    description: \"Lists the component files that decorators typically extend.\",\n    uri: \"decaf://decoration/components\",\n    mimeType: \"text/markdown\",\n    load: async () => ({\n      text: await readWorkspaceFile(\n        getWorkspaceRoot(),\n        path.join(\"workdocs\", \"tutorials\", \"Decoration.md\")\n      ).catch(() => \"Documentation pending for decoration components.\"),\n      mimeType: \"text/markdown\",\n    }),\n  },\n];\nEOF"]}
+[2m2025-10-24T23:46:52.100440Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","cat <<'EOF' > src/modules/decoration/templates/index.ts\nimport type { TemplateAsset } from \"../../../types\";\n\nexport const templates: TemplateAsset[] = [\n  {\n    id: \"decoration.template.decorator\",\n    title: \"Decorator Boilerplate\",\n    description: \"Scaffold describing the shape of a new decorator function.\",\n    content: `import { createDecorator } from \"@decaf-ts/decoration\";\n\nexport const {{decoratorName}} = createDecorator({\n  target: \"{{target}}\",\n  description: \"{{description}}\",\n  run(context) {\n    // TODO: implement decorator behavior\n  },\n});`,\n    placeholders: [\"decoratorName\", \"target\", \"description\"],\n  },\n];\nEOF"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:46:59.983229Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","cat <<'EOF' > src/modules/decoration/tools/index.ts\nimport type { Tool } from \"fastmcp\";\nimport { decoratorTools } from \"../../../mcp/tools\";\nimport type { ToolAsset } from \"../../../types\";\n\nfunction cloneTool(tool: Tool<unknown, unknown>): Tool<unknown, unknown> {\n  return {\n    ...tool,\n    handler: tool.handler,\n  };\n}\n\nexport const tools: ToolAsset[] = Object.entries(decoratorTools).map(\n  ([key, tool]) => ({\n    id: `decoration.tool.${key}`,\n    title: tool.name ?? key,\n    description: tool.description ?? \"Decorator helper tool\",\n    tags: [\"decoration\"],\n    tool: cloneTool(tool as Tool<unknown, unknown>),\n  })\n);\nEOF"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:47:06.953026Z[0m [32m INFO[0m ToolCall: apply_patch *** Begin Patch
+*** Update File: src/modules/decoration/index.ts
+@@
++import type { ModuleExportPackage } from "../../types";
++import { prompts } from "./prompts";
++import { resources } from "./resources";
++import { templates } from "./templates";
++import { tools } from "./tools";
++
++export { prompts } from "./prompts";
++export { resources } from "./resources";
++export { templates } from "./templates";
++export { tools } from "./tools";
++
++export const modulePackage: ModuleExportPackage = {
++  name: "decoration",
++  prompts,
++  resources,
++  templates,
++  tools,
++};
+*** End Patch
+[2m2025-10-24T23:47:14.834891Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","cat <<'EOF' > src/modules/mcp/prompts/index.ts\nimport type { PromptAsset } from \"../../../types\";\n\nexport const prompts: PromptAsset[] = [\n  {\n    id: \"mcp.prompt.module-catalog\",\n    title: \"Decaf MCP Module Catalog\",\n    description: \"Summarizes the modules contributing prompts/resources/templates/tools to FASTMCP.\",\n    load: async () =>\n      \"Use the module catalog tool to enumerate available module assets before fulfilling assistant requests.\",\n  },\n];\nEOF"]}
+[2m2025-10-24T23:47:22.821962Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","cat <<'EOF' > src/modules/mcp/resources/index.ts\nimport type { ResourceAsset } from \"../../../types\";\n\nexport const resources: ResourceAsset[] = [\n  {\n    id: \"mcp.resource.registry-overview\",\n    title: \"Module Registry Overview\",\n    description: \"Explains how the ModuleRegistry aggregates module exports into FASTMCP catalogs.\",\n    uri: \"decaf://mcp/module-registry\",\n    mimeType: \"text/markdown\",\n    load: async () => ({\n      text: [\n        \"# Module Registry\",\n        \"\",\n        \"The Decaf MCP server aggregates prompts, resources, templates, and tools from every module under src/modules.\",\n        \"Validators ensure each module contains the canonical folder layout before the registry loads it.\",\n      ].join(\"\\n\"),\n      mimeType: \"text/markdown\",\n    }),\n  },\n];\nEOF"]}
+[2m2025-10-24T23:47:32.760921Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","cat <<'EOF' > src/modules/mcp/templates/index.ts\nimport type { TemplateAsset } from \"../../../types\";\n\nexport const templates: TemplateAsset[] = [\n  {\n    id: \"mcp.template.module-readme\",\n    title: \"Module README Template\",\n    description: \"Guides maintainers through documenting a new MCP-aware module.\",\n    content: `# {{moduleName}} Module\n\n## Purpose\nDescribe why this module exists and how assistants should use it.\n\n## Assets\n- Prompts: {{promptSummary}}\n- Resources: {{resourceSummary}}\n- Templates: {{templateSummary}}\n- Tools: {{toolSummary}}\n\n## Validation\nExplain what needs to happen when this module changes (tests, docs, etc.).`,\n    placeholders: [\n      \"moduleName\",\n      \"promptSummary\",\n      \"resourceSummary\",\n      \"templateSummary\",\n      \"toolSummary\",\n    ],\n  },\n];\nEOF"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:47:43.605843Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","cat <<'EOF' > src/modules/mcp/tools/index.ts\nimport type { Tool } from \"fastmcp\";\nimport type { ToolAsset } from \"../../../types\";\n\nconst describeModulesTool: Tool<undefined, undefined> = {\n  name: \"describe-modules\",\n  description: \"Summarize the purpose of Decaf MCP modules for assistant operators.\",\n  inputSchema: { type: \"object\", properties: {} },\n  outputSchema: {\n    type: \"object\",\n    properties: {\n      summary: { type: \"string\" },\n    },\n  },\n  handler: async () => ({\n    content: {\n      type: \"text\",\n      text: \"Modules contribute prompts, resources, templates, and tools that the registry exposes to FASTMCP clients.\",\n    },\n  }),\n};\n\nexport const tools: ToolAsset[] = [\n  {\n    id: \"mcp.tool.describe-modules\",\n    title: \"Describe MCP Modules\",\n    description: \"Explains how module exports feed into the FASTMCP server.\",\n    tool: describeModulesTool,\n  },\n];\nEOF"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:47:51.293556Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","cat <<'EOF' > src/modules/mcp/index.ts\nimport type { ModuleExportPackage } from \"../../types\";\nimport { prompts } from \"./prompts\";\nimport { resources } from \"./resources\";\nimport { templates } from \"./templates\";\nimport { tools } from \"./tools\";\n\nexport { prompts } from \"./prompts\";\nexport { resources } from \"./resources\";\nexport { templates } from \"./templates\";\nexport { tools } from \"./tools\";\n\nexport const modulePackage: ModuleExportPackage = {\n  name: \"mcp\",\n  prompts,\n  resources,\n  templates,\n  tools,\n};\nEOF"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:47:58.351668Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","cat <<'EOF' > src/modules/index.ts\nimport type { ModuleExportPackage } from \"../types\";\nimport { modulePackage as decorationModule } from \"./decoration\";\nimport { modulePackage as mcpModule } from \"./mcp\";\n\nexport const modulePackages: ModuleExportPackage[] = [\n  decorationModule,\n  mcpModule,\n];\nEOF"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:48:19.043613Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","cat <<'EOF' > src/utils/moduleValidator.ts\nimport fs from \"node:fs\";\nimport path from \"node:path\";\nimport { getWorkspaceRoot } from \"../mcp/workspace\";\nimport type { ModuleExportPackage, ValidationIssue } from \"../types\";\nimport {\n  REQUIRED_MODULE_FOLDERS,\n  listModuleDirectories,\n  resolveModuleFolderPath,\n} from \"./modulePaths\";\nimport { modulePackages } from \"../modules\";\n\nexport type ModuleValidationSummary = {\n  issues: ValidationIssue[];\n  hasErrors: boolean;\n  packages: ModuleExportPackage[];\n};\n\nfunction fileExists(filePath: string): boolean {\n  return fs.existsSync(filePath);\n}\n\nexport function validateModuleScaffolding(\n  workspaceRoot = getWorkspaceRoot()\n): ModuleValidationSummary {\n  const issues: ValidationIssue[] = [];\n  const modules = listModuleDirectories(workspaceRoot);\n  const manifest = new Map(modulePackages.map((pkg) => [pkg.name, pkg]));\n\n  for (const moduleName of modules) {\n    for (const folder of REQUIRED_MODULE_FOLDERS) {\n      const folderPath = resolveModuleFolderPath(\n        moduleName,\n        folder,\n        workspaceRoot\n      );\n      if (!fs.existsSync(folderPath) || !fs.statSync(folderPath).isDirectory()) {\n        issues.push({\n          type: \"missing-folder\",\n          module: moduleName,\n          detail: `Missing ${folder} directory at ${folderPath}`,\n          severity: \"error\",\n        });\n        continue;\n      }\n\n      const indexTs = path.join(folderPath, \"index.ts\");\n      if (!fileExists(indexTs)) {\n        issues.push({\n          type: \"missing-export\",\n          module: moduleName,\n          detail: `Expected ${folder}/index.ts export for module ${moduleName}`,\n          severity: \"error\",\n        });\n      }\n    }\n\n    if (!manifest.has(moduleName)) {\n      issues.push({\n        type: \"missing-export\",\n        module: moduleName,\n        detail: `Module ${moduleName} is not registered in src/modules/index.ts`,\n        severity: \"error\",\n      });\n    }\n  }\n\n  for (const pkg of modulePackages) {\n    if (pkg.status === \"disabled\") continue;\n    for (const [key, assets] of Object.entries({\n      prompts: pkg.prompts,\n      resources: pkg.resources,\n      templates: pkg.templates,\n      tools: pkg.tools,\n    })) {\n      if (!assets.length) {\n        issues.push({\n          type: \"empty-asset\",\n          module: pkg.name,\n          detail: `Module ${pkg.name} has no ${key} defined`,\n          severity: \"warning\",\n        });\n      }\n    }\n  }\n\n  const hasErrors = issues.some((issue) => issue.severity === \"error\");\n  return { issues, hasErrors, packages: modulePackages };\n}\n\nexport function assertModuleScaffolding(workspaceRoot = getWorkspaceRoot()) {\n  const { issues, hasErrors } = validateModuleScaffolding(workspaceRoot);\n  if (hasErrors) {\n    const details = issues\n      .filter((issue) => issue.severity === \"error\")\n      .map((issue) => `- [${issue.module}] ${issue.detail}`)\n      .join(\"\\n\");\n    throw new Error(`Module validation failed:\\n${details}`);\n  }\n  return issues;\n}\nEOF"]}
+[2m2025-10-24T23:48:27.230051Z[0m [32m INFO[0m ToolCall: apply_patch *** Begin Patch
+*** Add File: src/bin/validate-modules.ts
++#!/usr/bin/env node
++import { assertModuleScaffolding } from "../utils/moduleValidator";
++
++async function main() {
++  try {
++    const issues = assertModuleScaffolding();
++    if (issues.length) {
++      console.log(
++        `[module-validator] Completed with ${issues.length} issue(s) (warnings may persist)`
++      );
++      for (const issue of issues) {
++        console.log(
++          `  - [${issue.severity.toUpperCase()}] ${issue.module}: ${issue.detail}`
++        );
++      }
++    } else {
++      console.log("[module-validator] Modules validated successfully");
++    }
++  } catch (error) {
++    console.error(`[module-validator] ${error instanceof Error ? error.message : error}`);
++    process.exitCode = 1;
++  }
++}
++
++void main();
+*** End Patch
+[2m2025-10-24T23:48:37.988473Z[0m [32m INFO[0m ToolCall: apply_patch *** Begin Patch
+*** Update File: package.json
+@@
+     "lint": "eslint .",
+     "lint-fix": "eslint --fix .",
+*** End Patch
+[2m2025-10-24T23:48:42.998181Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","cat package.json"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:48:50.478066Z[0m [32m INFO[0m ToolCall: apply_patch *** Begin Patch
+*** Update File: package.json
+@@
+-    "test:circular": "dpdm -T --no-warning --no-tree ./src/index.ts",
+-    "coverage": "rimraf ./workdocs/reports/data/*.json && npm run test:all -- --coverage --config=./workdocs/reports/jest.coverage.config.ts",
+-    "lint": "eslint .",
+-    "lint-fix": "eslint --fix .",
++    "test:circular": "dpdm -T --no-warning --no-tree ./src/index.ts",
++    "coverage": "rimraf ./workdocs/reports/data/*.json && npm run test:all -- --coverage --config=./workdocs/reports/jest.coverage.config.ts",
++    "validate:modules": "tsx src/bin/validate-modules.ts",
++    "lint": "npm run validate:modules && eslint .",
++    "lint-fix": "npm run validate:modules && eslint --fix .",
+*** End Patch
+[2m2025-10-24T23:48:58.976845Z[0m [32m INFO[0m ToolCall: apply_patch *** Begin Patch
+*** Update File: tests/setup.ts
+@@
+-import { jest } from "@jest/globals";
++import { jest } from "@jest/globals";
++import { assertModuleScaffolding } from "../src/utils/moduleValidator";
+@@
+ jest.mock("fastmcp", () => ({
+   FastMCP: MockFastMCP,
+   UserError: MockUserError,
+ }));
++
++beforeAll(() => {
++  assertModuleScaffolding();
++});
+*** End Patch
+[2m2025-10-24T23:49:14.231519Z[0m [32m INFO[0m ToolCall: apply_patch *** Begin Patch
+*** Update File: tests/unit/__helpers__/moduleFixtures.ts
+@@
+-const FIXTURE_ROOT = path.resolve(__dirname, "../../fixtures/modules");
++const FIXTURE_ROOT = path.resolve(__dirname, "../../fixtures/modules");
+ 
+ export function createTempModulesRoot(): string {
+   return fs.mkdtempSync(path.join(os.tmpdir(), "decaf-modules-"));
+ }
+@@
+ export function removeTempModulesRoot(root: string) {
+   if (fs.existsSync(root)) {
+     fs.rmSync(root, { recursive: true, force: true });
+   }
+ }
++
++export function createWorkspaceWithModules(
++  fixtureNames: string[]
++): { workspaceRoot: string; modulesRoot: string } {
++  const workspaceRoot = fs.mkdtempSync(path.join(os.tmpdir(), "decaf-ws-"));
++  const modulesRoot = path.join(workspaceRoot, "src/modules");
++  fs.mkdirSync(modulesRoot, { recursive: true });
++  for (const name of fixtureNames) {
++    copyFixtureModule(modulesRoot, name);
++  }
++  return { workspaceRoot, modulesRoot };
++}
++
++export function removeWorkspaceRoot(root: string) {
++  removeTempModulesRoot(root);
++}
+*** End Patch
+[2m2025-10-24T23:49:31.231739Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","cat <<'EOF' > tests/unit/moduleValidator.test.ts\nimport path from \"node:path\";\nimport { describe, expect, it, afterEach } from \"@jest/globals\";\nimport {\n  createWorkspaceWithModules,\n  removeWorkspaceRoot,\n} from \"./__helpers__/moduleFixtures\";\nimport { validateModuleScaffolding } from \"../../src/utils/moduleValidator\";\n\nconst FIXTURE_ROOT = path.resolve(__dirname, \"../fixtures\");\n\ndescribe(\"ModuleScaffoldingValidator\", () => {\n  const workspaceRoots: string[] = [];\n\n  afterEach(() => {\n    while (workspaceRoots.length) {\n      const root = workspaceRoots.pop();\n      if (root) {\n        removeWorkspaceRoot(root);\n      }\n    }\n  });\n\n  it(\"flags modules that are not registered in the manifest\", () => {\n    const { workspaceRoot } = createWorkspaceWithModules([\"sample-module\"]);\n    workspaceRoots.push(workspaceRoot);\n\n    const result = validateModuleScaffolding(workspaceRoot);\n    expect(result.hasErrors).toBe(true);\n    expect(result.issues).toEqual(\n      expect.arrayContaining([\n        expect.objectContaining({\n          module: \"sample-module\",\n          type: \"missing-export\",\n        }),\n      ])\n    );\n  });\n\n  it(\"passes the real workspace modules\", () => {\n    const realWorkspace = path.resolve(FIXTURE_ROOT, \"../../..\");\n    const result = validateModuleScaffolding(realWorkspace);\n    expect(result.hasErrors).toBe(false);\n  });\n});\nEOF"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:49:48.227411Z[0m [32m INFO[0m ToolCall: apply_patch *** Begin Patch
+*** Add File: src/mcp/moduleRegistry.ts
++import type {
++  ModuleExportPackage,
++  PromptAsset,
++  ResourceAsset,
++  TemplateAsset,
++  ToolAsset,
++} from "../types";
++import { modulePackages } from "../modules";
++
++type AssetKey = "prompts" | "resources" | "templates" | "tools";
++
++export class ModuleRegistry {
++  constructor(private readonly packages: ModuleExportPackage[] = modulePackages) {}
++
++  listPackages(): ModuleExportPackage[] {
++    return this.packages;
++  }
++
++  listPrompts(): PromptAsset[] {
++    return this.collectAssets("prompts");
++  }
++
++  listResources(): ResourceAsset[] {
++    return this.collectAssets("resources");
++  }
++
++  listTemplates(): TemplateAsset[] {
++    return this.collectAssets("templates");
++  }
++
++  listTools(): ToolAsset[] {
++    return this.collectAssets("tools");
++  }
++
++  private collectAssets<T extends PromptAsset | ResourceAsset | TemplateAsset | ToolAsset>(
++    key: AssetKey
++  ): T[] {
++    const seen = new Map<string, string>();
++    const aggregated: T[] = [];
++
++    for (const pkg of this.packages) {
++      if (pkg.status === "disabled") continue;
++      for (const asset of pkg[key] as T[]) {
++        if (seen.has(asset.id)) {
++          const conflict = seen.get(asset.id);
++          throw new Error(
++            `Duplicate ${key} id '${asset.id}' from modules ${conflict} and ${pkg.name}`
++          );
++        }
++        seen.set(asset.id, pkg.name);
++        aggregated.push({ ...asset, provenance: pkg.name });
++      }
++    }
++
++    return aggregated;
++  }
++}
++
++export const moduleRegistry = new ModuleRegistry();
+*** End Patch
+[2m2025-10-24T23:50:06.969099Z[0m [32m INFO[0m ToolCall: apply_patch *** Begin Patch
+*** Update File: src/mcp/prompts/prompts.ts
+@@
+-import {
++import {
+   CLIENT_INTEGRATIONS,
+   DEFAULT_PROMPT_NAME,
+   PROMPT_DIRECTORIES,
+ } from "../../constants";
+-import type { DocPrompt } from "../types";
++import type { DocPrompt } from "../types";
+ import { getWorkspaceRoot } from "../workspace";
++import type { PromptAsset } from "../../types";
++import { moduleRegistry } from "../moduleRegistry";
+@@
+-export function refreshPrompts(repoPath?: string): InputPrompt<undefined>[] {
+-  const docPrompts = buildDocPrompts();
+-  const objectPrompts = buildObjectPrompts();
+-  const repoPrompts = repoPath ? buildPrompts(repoPath) : [];
++function toInputPrompt(asset: PromptAsset): InputPrompt<undefined> {
++  return {
++    name: asset.id,
++    description: asset.description ?? asset.title,
++    load: async () => asset.load(),
++  };
++}
++
++function buildModulePrompts(): InputPrompt<undefined>[] {
++  return moduleRegistry.listPrompts().map(toInputPrompt);
++}
++
++export function refreshPrompts(repoPath?: string): InputPrompt<undefined>[] {
++  const docPrompts = buildDocPrompts();
++  const objectPrompts = buildObjectPrompts();
++  const repoPrompts = repoPath ? buildPrompts(repoPath) : [];
++  const modulePrompts = buildModulePrompts();
+   prompts.splice(
+     0,
+     prompts.length,
+-    ...docPrompts,
+-    ...objectPrompts,
+-    ...repoPrompts
++    ...docPrompts,
++    ...objectPrompts,
++    ...repoPrompts,
++    ...modulePrompts
+   );
+   return prompts;
+ }
+*** End Patch
+[2m2025-10-24T23:50:22.544581Z[0m [32m INFO[0m ToolCall: apply_patch *** Begin Patch
+*** Update File: src/mcp/resources/resources.ts
+@@
+-import type { Resource } from "fastmcp";
+-import { getWorkspaceRoot } from "../workspace";
+-import {
+-  buildObjectPrompts,
+-  discoverDocPrompts,
+-} from "../prompts/prompts";
++import type { Resource } from "fastmcp";
++import type { ResourceAsset } from "../../types";
++import { moduleRegistry } from "../moduleRegistry";
++import { getWorkspaceRoot } from "../workspace";
++import {
++  buildObjectPrompts,
++  discoverDocPrompts,
++} from "../prompts/prompts";
+@@
+-export const resources: Resource<undefined>[] = [
++function toResource(asset: ResourceAsset): Resource<undefined> {
++  return {
++    name: asset.id,
++    uri: asset.uri,
++    description: asset.description ?? asset.title,
++    mimeType: asset.mimeType,
++    load: () => asset.load(),
++  };
++}
++
++function buildModuleResources(): Resource<undefined>[] {
++  return moduleRegistry.listResources().map(toResource);
++}
++
++export const resources: Resource<undefined>[] = [
+   {
+     name: "codex-prompt-index",
+@@
+-  },
+-];
++  },
++  ...buildModuleResources(),
++];
+*** End Patch
+[2m2025-10-24T23:50:29.294879Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","sed -n '1,120p' src/mcp/templates/codex-templates.ts"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:50:48.167727Z[0m [32m INFO[0m ToolCall: apply_patch *** Begin Patch
+*** Update File: src/mcp/templates/index.ts
+@@
+-import {
++import {
+   buildCodexPromptTemplates,
+   codexPromptTemplates,
+ } from "./codex-templates";
+@@
+-import {
++import {
+   buildWorkspaceResourceTemplates,
+   workspaceResourceTemplates,
+ } from "./workspace-templates";
++import type { TemplateAsset } from "../../types";
++import { moduleRegistry } from "../moduleRegistry";
+@@
+ export function buildResourceTemplates() {
+-  return [
++  const moduleTemplates = moduleRegistry.listTemplates().map((template) => ({
++    name: template.id,
++    description: template.description ?? template.title,
++    mimeType: "text/markdown",
++    uriTemplate: `module-template://${template.id}`,
++    arguments: (template.placeholders ?? []).map((name) => ({
++      name,
++      description: `Value for ${name}`,
++      required: true,
++    })),
++    load: async () => ({ text: template.content }),
++  }));
++
++  return [
+     ...buildWorkspaceResourceTemplates(),
+     ...buildCodexPromptTemplates(),
+     ...buildDecorationResourceTemplates(),
++    ...moduleTemplates,
+   ];
+ }
+*** End Patch
+[2m2025-10-24T23:51:03.903732Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","sed -n '1,200p' src/mcp/tools/index.ts"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:51:29.512739Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","cat <<'EOF' > src/modules/decoration/tools/index.ts\nimport type { Tool } from \"fastmcp\";\nimport type { ToolAsset } from \"../../../types\";\n\nconst summarizeDecoratorsTool: Tool<undefined, undefined> = {\n  name: \"summarize-decorator-patterns\",\n  description: \"Summaries of decorator extension points in Decaf projects.\",\n  inputSchema: { type: \"object\", properties: {} },\n  outputSchema: {\n    type: \"object\",\n    properties: {\n      summary: { type: \"string\" },\n    },\n  },\n  handler: async () => ({\n    content: {\n      type: \"text\",\n      text: \"Use decorator factories in @decaf-ts/decoration to extend CLI commands, metadata, and validation.\",\n    },\n  }),\n};\n\nexport const tools: ToolAsset[] = [\n  {\n    id: \"decoration.tool.summarize\",\n    title: \"Summarize Decorator Patterns\",\n    description: \"Provides a refresher on how to extend the decoration module.\",\n    tags: [\"decoration\"],\n    tool: summarizeDecoratorsTool,\n  },\n];\nEOF"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:51:38.719367Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","sed -n '320,380p' src/mcp/tools/tools.ts"]}
+[2m2025-10-24T23:51:46.201001Z[0m [32m INFO[0m ToolCall: apply_patch *** Begin Patch
+*** Update File: src/mcp/tools/index.ts
+@@
+-import { decoratorTools } from "../decorator-tools";
++import { decoratorTools } from "../decorator-tools";
++import { moduleRegistry } from "../moduleRegistry";
+@@
+-const codexToolList = [
++const codexToolList = [
+   documentObjectTool,
+   coverageEnforcerTool,
+   readmeImprovementTool,
+ ];
+ 
+-export const toolList = [...coreToolList, ...codexToolList];
++const moduleToolList = moduleRegistry.listTools().map((asset) => asset.tool as any);
++
++export const toolList = [...coreToolList, ...codexToolList, ...moduleToolList];
+*** End Patch
+[2m2025-10-24T23:52:02.169843Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","cat <<'EOF' > tests/integration/mcp/moduleRegistry.int.test.ts\nimport { describe, expect, it } from \"@jest/globals\";\nimport { ModuleRegistry } from \"../../../src/mcp/moduleRegistry\";\nimport type { ModuleExportPackage } from \"../../../src/types\";\n\nconst basePackage: ModuleExportPackage = {\n  name: \"test-module\",\n  prompts: [\n    {\n      id: \"test.prompt\",\n      title: \"Test Prompt\",\n      load: () => \"prompt\",\n    },\n  ],\n  resources: [],\n  templates: [],\n  tools: [],\n};\n\ndescribe(\"ModuleRegistry\", () => {\n  it(\"adds provenance metadata to aggregated assets\", () => {\n    const registry = new ModuleRegistry([basePackage]);\n    const prompts = registry.listPrompts();\n    expect(prompts[0].provenance).toBe(\"test-module\");\n  });\n\n  it(\"throws when duplicate asset IDs are detected\", () => {\n    const duplicatePackage: ModuleExportPackage = {\n      ...basePackage,\n      name: \"duplicate-module\",\n    };\n    const registry = new ModuleRegistry([basePackage, duplicatePackage]);\n    expect(() => registry.listPrompts()).toThrow(/Duplicate/);\n  });\n});\nEOF"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:52:13.128928Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","mkdir -p tests/integration/mcp && cat <<'EOF' > tests/integration/mcp/moduleRegistry.int.test.ts\nimport { describe, expect, it } from \"@jest/globals\";\nimport { ModuleRegistry } from \"../../../src/mcp/moduleRegistry\";\nimport type { ModuleExportPackage } from \"../../../src/types\";\n\nconst basePackage: ModuleExportPackage = {\n  name: \"test-module\",\n  prompts: [\n    {\n      id: \"test.prompt\",\n      title: \"Test Prompt\",\n      load: () => \"prompt\",\n    },\n  ],\n  resources: [],\n  templates: [],\n  tools: [],\n};\n\ndescribe(\"ModuleRegistry\", () => {\n  it(\"adds provenance metadata to aggregated assets\", () => {\n    const registry = new ModuleRegistry([basePackage]);\n    const prompts = registry.listPrompts();\n    expect(prompts[0].provenance).toBe(\"test-module\");\n  });\n\n  it(\"throws when duplicate asset IDs are detected\", () => {\n    const duplicatePackage: ModuleExportPackage = {\n      ...basePackage,\n      name: \"duplicate-module\",\n    };\n    const registry = new ModuleRegistry([basePackage, duplicatePackage]);\n    expect(() => registry.listPrompts()).toThrow(/Duplicate/);\n  });\n});\nEOF"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:52:22.563215Z[0m [32m INFO[0m ToolCall: shell {"command":["bash","-lc","sed -n '1,200p' src/mcp/index.ts"],"workdir":"/home/tvenceslau/local-workspace/decaf-ts/mcp-server"}
+[2m2025-10-24T23:52:45.489382Z[0m [32m INFO[0m ToolCall: apply_patch *** Begin Patch
+*** Update File: src/mcp/prompts/prompts.ts
+@@
+-function toInputPrompt(asset: PromptAsset): InputPrompt<undefined> {
++function toInputPrompt(asset: PromptAsset): InputPrompt<undefined> {
++  const provenance = asset.provenance
++    ? ` (module: ${asset.provenance})`
++    : "";
+   return {
+     name: asset.id,
+-    description: asset.description ?? asset.title,
++    description: `${asset.description ?? asset.title}${provenance}`,
+     load: async () => asset.load(),
+   };
+ }
+*** End Patch
+[2m2025-10-24T23:52:46.821381Z[0m [32m INFO[0m Turn error: You've hit your usage limit. To get more access now, send a request to your admin or try again in 3 days 10 hours 2 minutes.

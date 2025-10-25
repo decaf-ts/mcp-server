@@ -1,4 +1,5 @@
 import { decoratorTools } from "../decorator-tools";
+import { moduleRegistry } from "../moduleRegistry";
 import {
   applyCodeChangeTool,
   documentCodeTool,
@@ -19,7 +20,9 @@ const codexToolList = [
   readmeImprovementTool,
 ];
 
-export const toolList = [...coreToolList, ...codexToolList];
+const moduleToolList = moduleRegistry.listTools().map((asset) => asset.tool as any);
+
+export const toolList = [...coreToolList, ...codexToolList, ...moduleToolList];
 export const decoratorToolList = Object.values(decoratorTools);
 const [
   analyzeRepositoryTool,

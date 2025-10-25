@@ -1,0 +1,164 @@
+openapi: 3.1.0
+info:
+  title: Decaf MCP Module Registry API
+  version: 1.0.0
+  description: >
+    Contract documenting the internal HTTP/IPC surface used by the FASTMCP server
+    (or diagnostics harness) to inspect module scaffolding, trigger validation,
+    and fetch the enriched asset catalog that assistants consume.
+servers:
+  - url: http://localhost:7337
+    description: Local FASTMCP developer preview
+paths:
+  /modules:
+    get:
+      summary: List all registered modules and their structural status
+      operationId: listModules
+      responses:
+        '200':
+          description: Successfully retrieved module metadata
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  modules:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ModulePackage'
+  /modules/{moduleName}/validate:
+    post:
+      summary: Run validation for a specific module
+      operationId: validateModule
+      parameters:
+        - name: moduleName
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Validation completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationReport'
+        '404':
+          description: Module not found
+  /mcp/catalog:
+    get:
+      summary: Fetch the aggregate MCP asset catalog
+      operationId: getCatalog
+      responses:
+        '200':
+          description: Aggregated prompts, resources, templates, and tools
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AggregateCatalog'
+components:
+  schemas:
+    ModulePackage:
+      type: object
+      required:
+        - name
+        - status
+        - prompts
+        - resources
+        - templates
+        - tools
+      properties:
+        name:
+          type: string
+        status:
+          type: string
+          enum: [active, disabled]
+        version:
+          type: string
+        prompts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Asset'
+        resources:
+          type: array
+          items:
+            $ref: '#/components/schemas/Asset'
+        templates:
+          type: array
+          items:
+            $ref: '#/components/schemas/Asset'
+        tools:
+          type: array
+          items:
+            $ref: '#/components/schemas/Asset'
+    ValidationReport:
+      type: object
+      properties:
+        module:
+          type: string
+        issues:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationIssue'
+        passed:
+          type: boolean
+    ValidationIssue:
+      type: object
+      required:
+        - type
+        - detail
+        - severity
+      properties:
+        type:
+          type: string
+          enum: [missing-folder, missing-export, duplicate-id, empty-asset, runtime-failure]
+        detail:
+          type: string
+        severity:
+          type: string
+          enum: [error, warning]
+    AggregateCatalog:
+      type: object
+      properties:
+        moduleCount:
+          type: integer
+        generatedAt:
+          type: string
+          format: date-time
+        prompts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Asset'
+        resources:
+          type: array
+          items:
+            $ref: '#/components/schemas/Asset'
+        templates:
+          type: array
+          items:
+            $ref: '#/components/schemas/Asset'
+        tools:
+          type: array
+          items:
+            $ref: '#/components/schemas/Asset'
+    Asset:
+      type: object
+      required:
+        - id
+        - title
+        - module
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        payload:
+          type: object
+        tags:
+          type: array
+          items:
+            type: string
+        module:
+          type: string

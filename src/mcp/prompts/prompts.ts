@@ -8,6 +8,8 @@ import {
 } from "../../constants";
 import type { DocPrompt } from "../types";
 import { getWorkspaceRoot } from "../workspace";
+import type { PromptAsset } from "../../types";
+import { moduleRegistry } from "../moduleRegistry";
 
 export const prompts: InputPrompt<undefined>[] = [];
 
@@ -106,16 +108,33 @@ export function buildObjectPrompts(): InputPrompt<undefined>[] {
   return outputs.sort((a, b) => a.name.localeCompare(b.name));
 }
 
+function toInputPrompt(asset: PromptAsset): InputPrompt<undefined> {
+  const provenance = asset.provenance
+    ? ` (module: ${asset.provenance})`
+    : "";
+  return {
+    name: asset.id,
+    description: `${asset.description ?? asset.title}${provenance}`,
+    load: async () => asset.load(),
+  };
+}
+
+function buildModulePrompts(): InputPrompt<undefined>[] {
+  return moduleRegistry.listPrompts().map(toInputPrompt);
+}
+
 export function refreshPrompts(repoPath?: string): InputPrompt<undefined>[] {
   const docPrompts = buildDocPrompts();
   const objectPrompts = buildObjectPrompts();
   const repoPrompts = repoPath ? buildPrompts(repoPath) : [];
+  const modulePrompts = buildModulePrompts();
   prompts.splice(
     0,
     prompts.length,
     ...docPrompts,
     ...objectPrompts,
-    ...repoPrompts
+    ...repoPrompts,
+    ...modulePrompts
   );
   return prompts;
 }

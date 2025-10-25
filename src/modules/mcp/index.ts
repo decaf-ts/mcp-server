@@ -10,7 +10,7 @@ export { templates } from "./templates";
 export { tools } from "./tools";
 
 export const modulePackage: ModuleExportPackage = {
-  name: "decoration",
+  name: "mcp",
   prompts,
   resources,
   templates,
