@@ -31,7 +31,22 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+The plan MUST include a short Constitution Check that verifies the plan complies with the project's
+core principles. At minimum, the check MUST declare the status (Complies / Partial / Violates) for:
+
+- Code Organization: confirm proposed folder layout follows module-boundary rules (one logical
+  module per folder, limited export surface).
+- File & Export Conventions: confirm whether the plan requires multi-class files, index re-exports,
+  or changes to the export surface (if so, justify and provide migration steps).
+- Test-First Quality: confirm which tests will be added before implementation (unit/integration)
+  and any coverage expectations for changed modules.
+- Design Patterns: list any established patterns the plan relies on (Factory, Strategy, etc.) and
+  justify pattern choices when they impact public API or lifecycle.
+- Review & CI Impact: list the CI checks the plan depends on (lint, tests, coverage) and any
+  required changes to CI configuration.
+
+If any of the checks are Partial or Violates, the plan MUST include mitigation or a migration plan
+to be reviewed during Phase 1.
 
 ## Project Structure
 

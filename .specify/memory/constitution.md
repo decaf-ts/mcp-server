@@ -1,50 +1,101 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report
+
+- Version change: none (template) → 1.0.0
+- Modified / Added Principles:
+	- Core: Code Organization, File & Export Conventions, Test-First Quality,
+		Design Patterns & Simplicity, Review/CI & Observability
+- Added sections: Constraints & Tooling; Development Workflow & Quality Gates
+- Removed sections: none (template placeholders replaced)
+- Templates requiring updates:
+	- .specify/templates/plan-template.md ✅ updated
+	- .specify/templates/tasks-template.md ⚠ pending (no change required but recommend review)
+	- .specify/templates/spec-template.md ⚠ pending (aligns with principles; no mandatory edits)
+- Follow-up TODOs:
+	- TODO(RATIFICATION_DATE): confirm original ratification date or accept today's date
+	- Review `workdocs/tutorials/For Developers.md` to ensure npm script guidance remains accurate
+	- Optionally add a `docs/context.json` schema if repos adopt explicit mapping overrides for TOOL4
+-->
+
+# Decaf MCP Server Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Code Organization & Module Boundaries
+All related functionality MUST be grouped in folders that act as logical modules (analogous to namespaces).
+Folders define module boundaries; avoid implicit cross-folder dependencies. Each folder should have a
+clear purpose and a small export surface.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+Rationale: Physical layout (folders/files) is the primary mechanism we use to express architecture
+and to keep surface area small when reviewing and testing changes.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### II. File & Export Conventions
+- One class per file. Each class file MUST export the class explicitly.
+- One interface per file unless the interface exists solely as an inline type for a single file.
+- Types that group multiple interfaces SHOULD be placed in a `types.ts` file within the folder.
+- Constants and enums SHOULD be placed in a `constants.ts` file within the folder.
+- Decorators SHOULD be placed in a `decorators.ts` file within the folder.
+- Pure/utils functions SHOULD be grouped in a `utils.ts` file or a small set of named files per
+	related functionality; limit the number of exported utilities.
+- Always import from the specific file path (e.g., `import X from '../module/x'`) rather than from
+	a folder index. The only exceptions are external package entry points and deliberate package
+	boundaries.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+Rationale: These rules reduce merge conflicts, clarify ownership, and make static analysis and
+automated tooling more reliable.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### III. Test-First Quality (NON-NEGOTIABLE)
+- Tests MUST be authored for each new public behavior prior to implementation (unit tests at a
+	minimum). Integration tests are required for cross-module contracts.
+- The repository gating policy requires: linting pass, unit tests pass, and coverage thresholds
+	respected for changed code.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+Rationale: Tests are the contract for future maintainers and are enforced by CI checks.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### IV. Design Patterns & Simplicity
+- Prefer established design patterns (Factory, Strategy, Observer, Builder) where they reduce
+	complexity and improve testability. Avoid misuse of Singleton unless justified.
+- Prefer composition over inheritance and favor small, focused interfaces.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+Rationale: Patterns are aids, not rules; use them when they clarify intent and reduce duplication.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### V. Review, CI, Observability & Release Discipline
+- Every PR MUST include a clear purpose and link to the feature spec or issue.
+- CI MUST run linting, unit tests, and basic integration checks for the affected modules.
+- Documentation updates and test coverage artifacts SHOULD be part of the PR when user-facing
+	behavior changes.
+- Releases MUST follow semantic versioning and use the repository `npm run release` flow.
+
+Rationale: Automated checks and clear PRs prevent regressions and keep release artifacts trustworthy.
+
+## Constraints & Tooling
+- Node.js: supported versions declared in `package.json` (follow repo guidance; defaults may be
+	Node 16+; check `workdocs/tutorials/For Developers.md` for project-specific notes).
+- CI: GitHub Actions / GitLab CI pipelines MUST run lint, tests, build, and docs where relevant.
+- Documentation: `npm run docs` generates the compiled docs; use `workdocs/tutorials/For Developers.md`
+	for developer onboarding commands (set-git-auth, do-install, update-scripts, build, test, docs).
+
+Rationale: Make development, CI, and docs reproducible across developer machines and CI environments.
+
+## Development Workflow & Quality Gates
+- Branch naming and feature spec conventions from `.specify/` MUST be followed for new features.
+- Before merging a feature PR, ensure:
+	- Spec exists and passes the Constitution Check in `plan.md`.
+	- Unit tests and linting pass for changed files.
+	- Any new public API changes are documented.
+- The `plan.md` generated from `/speckit.plan` MUST include a short "Constitution Check" section
+	that lists which principles are impacted and how the proposed changes comply.
+
+Rationale: Embedding the constitution check in planning reduces last-minute policy surprises during
+reviews and ensures architectural coherence.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
+- Amendments to this constitution MUST be made via pull request and require at least two approvals
+	from repository maintainers (or the designated governance group).
+- Amendments MUST include a migration plan for any rules that affect existing code (e.g., file
+	layout changes, export surface changes).
+- Versioning: Semantic versioning is used for the constitution document itself. Initial ratification
+	uses version `1.0.0`. Patch bumps are for wording clarifications; minor bumps for added
+	principles; major bumps for redefinitions or removals.
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
-
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: TODO(RATIFICATION_DATE): confirm original adoption date | **Last Amended**: 2025-10-25
