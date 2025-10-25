@@ -182,24 +182,6 @@ export function validateModuleScaffolding(workspaceRoot = process.cwd()) {
   }
 
   const hasErrors = issues.some((i) => i.severity === "error");
-  // Temporary debug: when invoked against test-created workspaces, also write a copy
-  // of the issues to /tmp so we can inspect after the test deletes the workspace.
-  try {
-    const base = path.basename(path.resolve(workspaceRoot));
-    if (base.startsWith("mcp-test-")) {
-      const outPath = path.join(
-        "/tmp",
-        `validate-debug-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.json`
-      );
-      fs.writeFileSync(
-        outPath,
-        JSON.stringify({ workspaceRoot, issues, hasErrors }, null, 2),
-        "utf8"
-      );
-    }
-  } catch {
-    // ignore write errors
-  }
   return { issues, hasErrors };
 }
 
@@ -217,3 +199,4 @@ export function assertModuleScaffolding(workspaceRoot = process.cwd()) {
   }
   return issues;
 }
+
