@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="47" failures="0" errors="0" time="0.791">
+  <testsuite name="codex-driven MCP tools" errors="0" failures="0" skipped="0" timestamp="2025-10-24T08:53:22" time="0.31" tests="11">
+    <testcase classname="codex-driven MCP tools document-object returns prompt guidance and file inventory" name="codex-driven MCP tools document-object returns prompt guidance and file inventory" time="0.008">
+    </testcase>
+    <testcase classname="codex-driven MCP tools ensure-test-coverage parses coverage report and highlights weakest files" name="codex-driven MCP tools ensure-test-coverage parses coverage report and highlights weakest files" time="0.002">
+    </testcase>
+    <testcase classname="codex-driven MCP tools improve-readme summarises repository analysis and prompts" name="codex-driven MCP tools improve-readme summarises repository analysis and prompts" time="0.002">
+    </testcase>
+    <testcase classname="codex-driven MCP tools resource templates expose codex, workspace, and decoration helpers" name="codex-driven MCP tools resource templates expose codex, workspace, and decoration helpers" time="0.001">
+    </testcase>
+    <testcase classname="codex-driven MCP tools resources list codex prompts and resolved guidance" name="codex-driven MCP tools resources list codex prompts and resolved guidance" time="0.002">
+    </testcase>
+    <testcase classname="codex-driven MCP tools document-object rejects paths outside workspace" name="codex-driven MCP tools document-object rejects paths outside workspace" time="0.004">
+    </testcase>
+    <testcase classname="codex-driven MCP tools document-object rejects target files outside workspace" name="codex-driven MCP tools document-object rejects target files outside workspace" time="0.002">
+    </testcase>
+    <testcase classname="codex-driven MCP tools ensure-test-coverage surfaces command failures" name="codex-driven MCP tools ensure-test-coverage surfaces command failures" time="0.15">
+    </testcase>
+    <testcase classname="codex-driven MCP tools ensure-test-coverage reports missing reports" name="codex-driven MCP tools ensure-test-coverage reports missing reports" time="0.007">
+    </testcase>
+    <testcase classname="codex-driven MCP tools readme improvement can skip example harvest" name="codex-driven MCP tools readme improvement can skip example harvest" time="0.008">
+    </testcase>
+    <testcase classname="codex-driven MCP tools object prompt helpers aggregate codex guidance" name="codex-driven MCP tools object prompt helpers aggregate codex guidance" time="0.009">
+    </testcase>
+  </testsuite>
+  <testsuite name="McpWrapper" errors="0" failures="0" skipped="0" timestamp="2025-10-24T08:53:22" time="0.103" tests="3">
+    <testcase classname="McpWrapper crawl discovers MCP modules and load returns metadata" name="McpWrapper crawl discovers MCP modules and load returns metadata" time="0.027">
+    </testcase>
+    <testcase classname="McpWrapper boot loads modules from global modules list" name="McpWrapper boot loads modules from global modules list" time="0.011">
+    </testcase>
+    <testcase classname="McpWrapper load rethrows module loading errors" name="McpWrapper load rethrows module loading errors" time="0.004">
+    </testcase>
+  </testsuite>
+  <testsuite name="@decaf-ts/mcp-server decorator-validation tools" errors="0" failures="0" skipped="0" timestamp="2025-10-24T08:53:22" time="0.072" tests="6">
+    <testcase classname="@decaf-ts/mcp-server decorator-validation tools create or update model file with properties and class decorators" name="@decaf-ts/mcp-server decorator-validation tools create or update model file with properties and class decorators" time="0.003">
+    </testcase>
+    <testcase classname="@decaf-ts/mcp-server decorator-validation tools fails when overwrite is disabled and file exists" name="@decaf-ts/mcp-server decorator-validation tools fails when overwrite is disabled and file exists" time="0.007">
+    </testcase>
+    <testcase classname="@decaf-ts/mcp-server decorator-validation tools add and remove attribute" name="@decaf-ts/mcp-server decorator-validation tools add and remove attribute" time="0.006">
+    </testcase>
+    <testcase classname="@decaf-ts/mcp-server decorator-validation tools add attribute ignores duplicates and errors on missing files" name="@decaf-ts/mcp-server decorator-validation tools add attribute ignores duplicates and errors on missing files" time="0.003">
+    </testcase>
+    <testcase classname="@decaf-ts/mcp-server decorator-validation tools apply and remove decorators" name="@decaf-ts/mcp-server decorator-validation tools apply and remove decorators" time="0.005">
+    </testcase>
+    <testcase classname="@decaf-ts/mcp-server decorator-validation tools scaffold validator, serializer and hashing" name="@decaf-ts/mcp-server decorator-validation tools scaffold validator, serializer and hashing" time="0.003">
+    </testcase>
+  </testsuite>
+  <testsuite name="MCP module integration" errors="0" failures="0" skipped="0" timestamp="2025-10-24T08:53:22" time="0.049" tests="3">
+    <testcase classname="MCP module integration enrich registers prompts, tools, and resource templates" name="MCP module integration enrich registers prompts, tools, and resource templates" time="0.003">
+    </testcase>
+    <testcase classname="MCP module integration document-code output can drive apply-code-change patches" name="MCP module integration document-code output can drive apply-code-change patches" time="0.003">
+    </testcase>
+    <testcase classname="MCP module integration resource templates expose source files to IDE schemes" name="MCP module integration resource templates expose source files to IDE schemes" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="@decaf-ts/mcp-server mcp module" errors="0" failures="0" skipped="0" timestamp="2025-10-24T08:53:22" time="0.03" tests="16">
+    <testcase classname="@decaf-ts/mcp-server mcp module document-code tool produces documentation scaffolding with code block" name="@decaf-ts/mcp-server mcp module document-code tool produces documentation scaffolding with code block" time="0.001">
+    </testcase>
+    <testcase classname="@decaf-ts/mcp-server mcp module document-code tool selects named prompt when available" name="@decaf-ts/mcp-server mcp module document-code tool selects named prompt when available" time="0.001">
+    </testcase>
+    <testcase classname="@decaf-ts/mcp-server mcp module document-code tool supports toggling sections and adding extra guidance" name="@decaf-ts/mcp-server mcp module document-code tool supports toggling sections and adding extra guidance" time="0.001">
+    </testcase>
+    <testcase classname="@decaf-ts/mcp-server mcp module document-code tool falls back to default prompt when the requested name is missing" name="@decaf-ts/mcp-server mcp module document-code tool falls back to default prompt when the requested name is missing" time="0">
+    </testcase>
+    <testcase classname="@decaf-ts/mcp-server mcp module document-code tool rejects requests that escape the workspace root" name="@decaf-ts/mcp-server mcp module document-code tool rejects requests that escape the workspace root" time="0.002">
+    </testcase>
+    <testcase classname="@decaf-ts/mcp-server mcp module document-code tool throws when no documentation prompts are available" name="@decaf-ts/mcp-server mcp module document-code tool throws when no documentation prompts are available" time="0.001">
+    </testcase>
+    <testcase classname="@decaf-ts/mcp-server mcp module document-code tool detects language for markdown and json sources" name="@decaf-ts/mcp-server mcp module document-code tool detects language for markdown and json sources" time="0.001">
+    </testcase>
+    <testcase classname="@decaf-ts/mcp-server mcp module document-code tool throws when file is missing" name="@decaf-ts/mcp-server mcp module document-code tool throws when file is missing" time="0.001">
+    </testcase>
+    <testcase classname="@decaf-ts/mcp-server mcp module document-code tool exposes integration prompts for IDE clients" name="@decaf-ts/mcp-server mcp module document-code tool exposes integration prompts for IDE clients" time="0.001">
+    </testcase>
+    <testcase classname="@decaf-ts/mcp-server mcp module apply-code-change tool applies a patch and returns diff preview" name="@decaf-ts/mcp-server mcp module apply-code-change tool applies a patch and returns diff preview" time="0.001">
+    </testcase>
+    <testcase classname="@decaf-ts/mcp-server mcp module apply-code-change tool supports dry-run validation without modifying files" name="@decaf-ts/mcp-server mcp module apply-code-change tool supports dry-run validation without modifying files" time="0.001">
+    </testcase>
+    <testcase classname="@decaf-ts/mcp-server mcp module apply-code-change tool returns summary string when showDiff is disabled" name="@decaf-ts/mcp-server mcp module apply-code-change tool returns summary string when showDiff is disabled" time="0.001">
+    </testcase>
+    <testcase classname="@decaf-ts/mcp-server mcp module apply-code-change tool rejects invalid unified diff patches" name="@decaf-ts/mcp-server mcp module apply-code-change tool rejects invalid unified diff patches" time="0.001">
+    </testcase>
+    <testcase classname="@decaf-ts/mcp-server mcp module apply-code-change tool prevents patching files outside the workspace" name="@decaf-ts/mcp-server mcp module apply-code-change tool prevents patching files outside the workspace" time="0.001">
+    </testcase>
+    <testcase classname="@decaf-ts/mcp-server mcp module resource templates load workspace files for IDE schemes" name="@decaf-ts/mcp-server mcp module resource templates load workspace files for IDE schemes" time="0.001">
+    </testcase>
+    <testcase classname="@decaf-ts/mcp-server mcp module resource templates throws when accessing paths outside workspace" name="@decaf-ts/mcp-server mcp module resource templates throws when accessing paths outside workspace" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="decoration-assist MCP module" errors="0" failures="0" skipped="0" timestamp="2025-10-24T08:53:22" time="0.021" tests="6">
+    <testcase classname="decoration-assist MCP module registers tools, prompts and resources" name="decoration-assist MCP module registers tools, prompts and resources" time="0.001">
+    </testcase>
+    <testcase classname="decoration-assist MCP module analyze-repository extracts files and tests for ./decoration" name="decoration-assist MCP module analyze-repository extracts files and tests for ./decoration" time="0.002">
+    </testcase>
+    <testcase classname="decoration-assist MCP module enumerate-capabilities returns capabilities based on analysis" name="decoration-assist MCP module enumerate-capabilities returns capabilities based on analysis" time="0.002">
+    </testcase>
+    <testcase classname="decoration-assist MCP module plan-feature-implementation suggests an execution plan using available tools" name="decoration-assist MCP module plan-feature-implementation suggests an execution plan using available tools" time="0">
+    </testcase>
+    <testcase classname="decoration-assist MCP module analyze-repository throws on invalid repo path" name="decoration-assist MCP module analyze-repository throws on invalid repo path" time="0.003">
+    </testcase>
+    <testcase classname="decoration-assist MCP module plan-feature-implementation for generic feature omits decorator-tools step" name="decoration-assist MCP module plan-feature-implementation for generic feature omits decorator-tools step" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="metadata module" errors="0" failures="0" skipped="0" timestamp="2025-10-24T08:53:23" time="0.011" tests="2">
+    <testcase classname="metadata module guards against duplicate registrations" name="metadata module guards against duplicate registrations" time="0.001">
+    </testcase>
+    <testcase classname="metadata module rethrows unexpected registration errors" name="metadata module rethrows unexpected registration errors" time="0.002">
+    </testcase>
+  </testsuite>
+</testsuites>

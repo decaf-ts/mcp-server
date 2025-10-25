@@ -1,30 +1,7 @@
-import type { Tool } from "fastmcp";
-import type { ToolAsset } from "../../../types";
-
-const summarizeDecoratorsTool: Tool<undefined, undefined> = {
-  name: "summarize-decorator-patterns",
-  description: "Summaries of decorator extension points in Decaf projects.",
-  inputSchema: { type: "object", properties: {} },
-  outputSchema: {
-    type: "object",
-    properties: {
-      summary: { type: "string" },
-    },
-  },
-  handler: async () => ({
-    content: {
-      type: "text",
-      text: "Use decorator factories in @decaf-ts/decoration to extend CLI commands, metadata, and validation.",
-    },
-  }),
-};
-
-export const tools: ToolAsset[] = [
-  {
-    id: "decoration.tool.summarize",
-    title: "Summarize Decorator Patterns",
-    description: "Provides a refresher on how to extend the decoration module.",
-    tags: ["decoration"],
-    tool: summarizeDecoratorsTool,
-  },
-];
+import type { Tool } from 'fastmcp';
+import { buildAnalyzeRepositoryTool, buildEnumerateCapabilitiesTool, buildPlanFeatureTool } from '../../../mcp/tools/tools';
+export const tools = [
+  { id: 'decoration.analyze', title: 'Analyze decoration', description: 'Analyze the target repository', tool: buildAnalyzeRepositoryTool() },
+  { id: 'decoration.enumerate', title: 'Enumerate capabilities for decoration', description: 'Enumerate capabilities', tool: buildEnumerateCapabilitiesTool() },
+  { id: 'decoration.plan', title: 'Plan features for decoration', description: 'Plan feature implementation', tool: buildPlanFeatureTool() },
+] as const;

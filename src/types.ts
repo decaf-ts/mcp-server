@@ -41,7 +41,7 @@ export interface TemplateAsset extends BaseAsset {
 }
 
 export interface ToolAsset extends BaseAsset {
-  tool: Tool<unknown, unknown>;
+  tool: Tool<any, any>;
 }
 
 export interface ModuleExportPackage {

@@ -1,4 +1,3 @@
-// ...existing code...
 // New: validation entrypoint for module structure
 import fs from "fs";
 import path from "path";
@@ -80,9 +79,12 @@ export function validateModules(repoRoot: string): ValidationReport {
         const indexFile = candidatesFindingIndex(subPath);
         if (indexFile) {
           const content = fs.readFileSync(indexFile, "utf8");
-          // crude heuristics: look for 'export' and '[' or '[]' or 'export const * = ['
+          // crude heuristics: look for `export const name = [` or `export const name: Type[] = [`,
+          // or any named export like `export { something }` which implies exports exist.
+          const exportListPattern =
+            /export\s+(const|let|var)\s+[\w$]+(?:\s*:\s*[^=]+)?\s*=\s*\[/;
           if (
-            !/export\s+(const|let|var)\s+[\w$]+\s*=\s*\[/.test(content) &&
+            !exportListPattern.test(content) &&
             !/export\s+\{/.test(content)
           ) {
             issues.push({

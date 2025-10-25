@@ -1,142 +1,115 @@
 #!/usr/bin/env node
-/* scripts/validate-modules.cjs
-   Lightweight text-based validator for src/modules structure.
-   Emits a JSON report and exits 0 on success, 1 on failure.
-*/
-const fs = require("fs");
+// @ts-nocheck
 const path = require("path");
+const fs = require("fs");
+const vm = require("vm");
 
-const ROOT = process.cwd();
-const MODULES_DIR = path.join(ROOT, "src", "modules");
-const REQUIRED = ["prompts", "resources", "templates", "tools"];
-
-function isDir(p) {
-  try {
-    return fs.statSync(p).isDirectory();
-  } catch {
-    return false;
-  }
-}
-function readIfExists(p) {
-  try {
-    return fs.readFileSync(p, "utf8");
-  } catch {
-    return null;
-  }
+function fail(msg) {
+  console.error(msg);
+  process.exit(1);
 }
 
-function findIndexFile(folder) {
-  const candidates = ["index.ts", "index.js", "index.mjs", "index.cjs"];
-  for (const c of candidates) {
-    const p = path.join(folder, c);
-    if (fs.existsSync(p)) return p;
-  }
-  return null;
+// Try to use ts-node first (dev environments)
+try {
+  require("ts-node").register({ transpileOnly: true });
+} catch (e) {
+  // ignore, will try fallback
 }
 
-function extractIdsFromText(text) {
-  const ids = [];
-  if (!text) return ids;
-  const re = /id\s*:\s*['"`]([^'"`]+)['"`]/g;
-  let m;
-  while ((m = re.exec(text)) !== null) ids.push(m[1]);
-  return ids;
-}
-
-function hasExport(text) {
-  if (!text) return false;
-  return (
-    /\bexport\b/.test(text) ||
-    /module\.exports/.test(text) ||
-    /exports\./.test(text)
+async function loadValidator(modulePath) {
+  // If compiled JS exists under lib, prefer that
+  const compiled = path.join(
+    process.cwd(),
+    "lib",
+    modulePath.replace(/\.ts$/, ".cjs")
   );
-}
-
-function hasDisabledTrue(text) {
-  if (!text) return false;
-  return /disabled\s*:\s*true/.test(text);
-}
-
-function scan() {
-  const report = { ok: true, modules: {}, duplicates: [] };
-  if (!isDir(MODULES_DIR)) {
-    report.ok = false;
-    report.error = `Missing modules directory: ${MODULES_DIR}`;
-    return report;
+  if (fs.existsSync(compiled)) {
+    return require(compiled);
   }
 
-  const modules = fs.readdirSync(MODULES_DIR).filter((name) => {
-    const p = path.join(MODULES_DIR, name);
-    return isDir(p);
-  });
+  // Try requiring the TS file directly (ts-node may have registered)
+  try {
+    return require(modulePath);
+  } catch (err) {
+    // Fallback: transpile TypeScript to CommonJS using TypeScript compiler API
+    try {
+      const ts = require("typescript");
+      const content = fs.readFileSync(modulePath, "utf8");
+      const transpiled = ts.transpileModule(content, {
+        compilerOptions: {
+          module: ts.ModuleKind.CommonJS,
+          target: ts.ScriptTarget.ES2020,
+          jsx: ts.JsxEmit.React,
+          esModuleInterop: true,
+        },
+        fileName: modulePath,
+      });
+      const script = new vm.Script(transpiled.outputText, {
+        filename: modulePath,
+      });
+      const module = { exports: {} };
+      const dirname = path.dirname(modulePath);
+      const sandboxRequire = require;
+      const wrapper = `(function(exports, require, module, __filename, __dirname){\n${transpiled.outputText}\n});`;
+      const wrapped = new vm.Script(wrapper, { filename: modulePath });
+      const func = wrapped.runInThisContext();
+      func(module.exports, sandboxRequire, module, modulePath, dirname);
+      return module.exports;
+    } catch (e2) {
+      throw err; // rethrow original require error for clarity
+    }
+  }
+}
 
-  const idMap = new Map(); // id -> [module]
-  for (const mod of modules) {
-    const modPath = path.join(MODULES_DIR, mod);
-    const mreport = {
-      path: modPath,
-      folders: {},
-      exports: {},
-      ids: [],
-      errors: [],
-    };
-    for (const f of REQUIRED) {
-      const folderPath = path.join(modPath, f);
-      if (!isDir(folderPath)) {
-        mreport.folders[f] = "missing";
-        mreport.errors.push(`Missing folder: ${f}`);
-        report.ok = false;
-        continue;
-      } else {
-        mreport.folders[f] = "ok";
+(async function main() {
+  try {
+    // Basic argv parsing: support --json-out <file>
+    const argv = process.argv.slice(2);
+    let jsonOut = null;
+    for (let i = 0; i < argv.length; i++) {
+      if (argv[i] === "--json-out" && argv[i + 1]) {
+        jsonOut = argv[i + 1];
+        i++;
       }
-      const idx = findIndexFile(folderPath);
-      if (!idx) {
-        mreport.exports[f] = { file: null, exported: false };
-        mreport.errors.push(`Missing index file in ${f}`);
-        report.ok = false;
-        continue;
+    }
+    const validator = await loadValidator(
+      path.join(__dirname, "..", "src", "mcp", "validation", "index.ts")
+    );
+    const report = validator.validateModules(process.cwd());
+    if (!report.ok) {
+      console.error("Module validation failed:");
+      console.error(JSON.stringify(report, null, 2));
+      if (jsonOut) {
+        try {
+          fs.writeFileSync(jsonOut, JSON.stringify(report, null, 2), "utf8");
+          console.error(`Wrote validation report to ${jsonOut}`);
+        } catch (e) {
+          console.error(
+            "Failed to write JSON report:",
+            e && e.message ? e.message : e
+          );
+        }
       }
-      const text = readIfExists(idx);
-      const exported = hasExport(text);
-      const disabled = hasDisabledTrue(text);
-      const ids = extractIdsFromText(text);
-      mreport.exports[f] = {
-        file: path.relative(ROOT, idx),
-        exported,
-        disabled,
-        ids,
-      };
-      if (!exported && !disabled) {
-        mreport.errors.push(
-          `No export found in ${f}/index and not explicitly disabled`
+      process.exit(2);
+    }
+    console.log("Module validation passed");
+    if (jsonOut) {
+      try {
+        fs.writeFileSync(jsonOut, JSON.stringify(report, null, 2), "utf8");
+        console.log(`Wrote validation report to ${jsonOut}`);
+      } catch (e) {
+        console.error(
+          "Failed to write JSON report:",
+          e && e.message ? e.message : e
         );
-        report.ok = false;
       }
-      for (const id of ids) {
-        if (!id) continue;
-        if (!idMap.has(id)) idMap.set(id, []);
-        idMap.get(id).push(mod);
-      }
-      mreport.ids.push(...ids);
     }
-    report.modules[mod] = mreport;
+    process.exit(0);
+  } catch (err) {
+    console.error(
+      "Error executing module validator:",
+      err && err.stack ? err.stack : err
+    );
+    process.exit(3);
   }
-
-  for (const [id, mods] of idMap.entries()) {
-    if (mods.length > 1) {
-      report.duplicates.push({ id, modules: mods });
-      report.ok = false;
-    }
-  }
-
-  return report;
-}
-
-function main() {
-  const out = scan();
-  console.log(JSON.stringify(out, null, 2));
-  process.exit(out.ok ? 0 : 1);
-}
-
-main();
+})();

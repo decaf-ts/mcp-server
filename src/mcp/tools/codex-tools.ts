@@ -23,6 +23,7 @@ import {
   discoverDocPrompts,
   getObjectPromptDependencies,
 } from "../prompts/prompts";
+import type { DocPrompt } from "../types";
 import { listFilesRecursive, readFileSafe } from "../utils";
 import { analyzeRepo, isSourceFile, isTestFile } from "../code";
 
@@ -31,6 +32,7 @@ type PromptSection = {
   title: string;
   description: string;
   content: string;
+  absolutePath?: string;
 };
 
 function relativeFiles(root: string, files: string[]): string[] {
@@ -39,17 +41,18 @@ function relativeFiles(root: string, files: string[]): string[] {
 
 function collectPromptSections(names: readonly string[]): PromptSection[] {
   const root = getWorkspaceRoot();
-  const promptIndex = new Map(
+  const promptIndex = new Map<string, DocPrompt>(
     discoverDocPrompts(root).map((prompt) => [prompt.name, prompt])
   );
   return names
     .map((name) => promptIndex.get(name))
-    .filter((prompt): prompt is PromptSection => Boolean(prompt))
+    .filter((prompt): prompt is DocPrompt => Boolean(prompt))
     .map((prompt) => ({
       name: prompt.name,
       title: prompt.title,
       description: prompt.description,
       content: prompt.content,
+      absolutePath: prompt.absolutePath,
     }));
 }
 
@@ -87,7 +90,9 @@ function computeCoverageFromFinal(coveragePath: string) {
     const functionTotal = functionCounts.length;
     const branchTotal = branchCounts.length;
 
-    const statementCovered = statementCounts.filter((count) => count > 0).length;
+    const statementCovered = statementCounts.filter(
+      (count) => count > 0
+    ).length;
     const functionCovered = functionCounts.filter((count) => count > 0).length;
     const branchCovered = branchCounts.filter((count) => count > 0).length;
 
@@ -114,9 +119,18 @@ function computeCoverageFromFinal(coveragePath: string) {
 
   return {
     totals: {
-      statements: { ...totals.statements, pct: pct(totals.statements.covered, totals.statements.total) },
-      functions: { ...totals.functions, pct: pct(totals.functions.covered, totals.functions.total) },
-      branches: { ...totals.branches, pct: pct(totals.branches.covered, totals.branches.total) },
+      statements: {
+        ...totals.statements,
+        pct: pct(totals.statements.covered, totals.statements.total),
+      },
+      functions: {
+        ...totals.functions,
+        pct: pct(totals.functions.covered, totals.functions.total),
+      },
+      branches: {
+        ...totals.branches,
+        pct: pct(totals.branches.covered, totals.branches.total),
+      },
     },
     files,
   };
@@ -143,156 +157,155 @@ async function resolveRepoRoot(basePath: string) {
   }
 }
 
-export const documentObjectTool: Tool<undefined, typeof documentObjectSchema> = {
-  name: "document-object",
-  description:
-    "Create a documentation plan for a specific object type using .codex prompts and repository analysis.",
-  parameters: documentObjectSchema,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  execute: async (input, _context): Promise<ContentResult> => {
-    const args = documentObjectSchema.parse(input as DocumentObjectArgs);
-    const repoRoot = await resolveRepoRoot(args.basePath);
+export const documentObjectTool: Tool<undefined, typeof documentObjectSchema> =
+  {
+    name: "document-object",
+    description:
+      "Create a documentation plan for a specific object type using .codex prompts and repository analysis.",
+    parameters: documentObjectSchema,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    execute: async (input, _context): Promise<ContentResult> => {
+      const args = documentObjectSchema.parse(input as DocumentObjectArgs);
+      const repoRoot = await resolveRepoRoot(args.basePath);
 
-    const dependencies =
-      getObjectPromptDependencies()[args.objectType] ?? [];
-    if (!dependencies.length) {
-      await throwUserError(
-        `No prompt guidance configured for object type ${args.objectType}`
+      const dependencies = getObjectPromptDependencies()[args.objectType] ?? [];
+      if (!dependencies.length) {
+        await throwUserError(
+          `No prompt guidance configured for object type ${args.objectType}`
+        );
+      }
+
+      const sections = normalizePromptSections(
+        collectPromptSections(dependencies)
       );
-    }
 
-    const sections = normalizePromptSections(
-      collectPromptSections(dependencies)
-    );
+      const srcDir = path.join(repoRoot, "src");
+      const testDir = path.join(repoRoot, "tests");
 
-    const srcDir = path.join(repoRoot, "src");
-    const testDir = path.join(repoRoot, "tests");
+      const sourceFiles = fs.existsSync(srcDir)
+        ? listFilesRecursive(srcDir, isSourceFile)
+        : [];
+      const testFiles = fs.existsSync(testDir)
+        ? listFilesRecursive(
+            testDir,
+            (file) => isSourceFile(file) && isTestFile(file)
+          )
+        : [];
 
-    const sourceFiles = fs.existsSync(srcDir)
-      ? listFilesRecursive(srcDir, isSourceFile)
-      : [];
-    const testFiles = fs.existsSync(testDir)
-      ? listFilesRecursive(testDir, (file) => isSourceFile(file) && isTestFile(file))
-      : [];
-
-    let targetFileContent: string | undefined;
-    if (args.targetFile) {
-      try {
-        const absolute = resolveInWorkspace(repoRoot, args.targetFile);
-        targetFileContent = readFileSafe(absolute) ?? undefined;
-      } catch (error) {
-        if (error instanceof WorkspaceError) {
-          await throwUserError(error.message);
+      let targetFileContent: string | undefined;
+      if (args.targetFile) {
+        try {
+          const absolute = resolveInWorkspace(repoRoot, args.targetFile);
+          targetFileContent = readFileSafe(absolute) ?? undefined;
+        } catch (error) {
+          if (error instanceof WorkspaceError) {
+            await throwUserError(error.message);
+          }
+          throw error;
         }
-        throw error;
       }
-    }
 
-    const payload = {
-      basePath: path.relative(getWorkspaceRoot(), repoRoot) || ".",
-      objectType: args.objectType,
-      targetFile: args.targetFile,
-      guidance: sections,
-      files: {
-        source: relativeFiles(repoRoot, sourceFiles),
-        tests: relativeFiles(repoRoot, testFiles),
-      },
-      targetFileContent: args.includeContent ? targetFileContent : undefined,
-    };
-
-    return {
-      content: [
-        {
-          type: "text",
-          text: JSON.stringify(payload, null, 2),
+      const payload = {
+        basePath: path.relative(getWorkspaceRoot(), repoRoot) || ".",
+        objectType: args.objectType,
+        targetFile: args.targetFile,
+        guidance: sections,
+        files: {
+          source: relativeFiles(repoRoot, sourceFiles),
+          tests: relativeFiles(repoRoot, testFiles),
         },
-      ],
-    } satisfies ContentResult;
-  },
-};
-
-export const coverageEnforcerTool: Tool<undefined, typeof coverageTaskSchema> = {
-  name: "ensure-test-coverage",
-  description:
-    "Run the configured coverage command and report whether the target percentage is met, highlighting weak files.",
-  parameters: coverageTaskSchema,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  execute: async (input, _context): Promise<ContentResult> => {
-    const args = coverageTaskSchema.parse(input as CoverageTaskArgs);
-    const repoRoot = await resolveRepoRoot(args.basePath);
-
-    if (!args.dryRun) {
-      const env = {
-        ...process.env,
-        USE_WATCHMAN: "false",
-        WATCHMAN_DISABLE: "1",
-        JEST_DISABLE_WATCHMAN: "1",
+        targetFileContent: args.includeContent ? targetFileContent : undefined,
       };
-      const result = spawnSync(
-        "npm",
-        [
-          "run",
-          "coverage",
-          "--",
-          "--watchman=false",
-          "--runInBand",
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(payload, null, 2),
+          },
         ],
-        { cwd: repoRoot, env, encoding: "utf8" }
-      );
+      } satisfies ContentResult;
+    },
+  };
 
-      if (result.status !== 0) {
-        const message = result.stderr || result.stdout || "Coverage command failed";
-        await throwUserError(message.trim());
+export const coverageEnforcerTool: Tool<undefined, typeof coverageTaskSchema> =
+  {
+    name: "ensure-test-coverage",
+    description:
+      "Run the configured coverage command and report whether the target percentage is met, highlighting weak files.",
+    parameters: coverageTaskSchema,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    execute: async (input, _context): Promise<ContentResult> => {
+      const args = coverageTaskSchema.parse(input as CoverageTaskArgs);
+      const repoRoot = await resolveRepoRoot(args.basePath);
+
+      if (!args.dryRun) {
+        const env = {
+          ...process.env,
+          USE_WATCHMAN: "false",
+          WATCHMAN_DISABLE: "1",
+          JEST_DISABLE_WATCHMAN: "1",
+        };
+        const result = spawnSync(
+          "npm",
+          ["run", "coverage", "--", "--watchman=false", "--runInBand"],
+          { cwd: repoRoot, env, encoding: "utf8" }
+        );
+
+        if (result.status !== 0) {
+          const message =
+            result.stderr || result.stdout || "Coverage command failed";
+          await throwUserError(message.trim());
+        }
       }
-    }
 
-    const coveragePath = path.join(
-      repoRoot,
-      "workdocs",
-      "reports",
-      "coverage",
-      "coverage-final.json"
-    );
-
-    if (!fs.existsSync(coveragePath)) {
-      await throwUserError(
-        `Coverage report not found at ${path.relative(repoRoot, coveragePath)}`
+      const coveragePath = path.join(
+        repoRoot,
+        "workdocs",
+        "reports",
+        "coverage",
+        "coverage-final.json"
       );
-    }
 
-    const summary = computeCoverageFromFinal(coveragePath);
-    const meetsThreshold =
-      summary.totals.statements.pct >= args.coverage &&
-      summary.totals.functions.pct >= args.coverage &&
-      summary.totals.branches.pct >= args.coverage;
+      if (!fs.existsSync(coveragePath)) {
+        await throwUserError(
+          `Coverage report not found at ${path.relative(repoRoot, coveragePath)}`
+        );
+      }
 
-    const weakest = [...summary.files]
-      .sort((a, b) => a.statements - b.statements)
-      .slice(0, 10);
+      const summary = computeCoverageFromFinal(coveragePath);
+      const meetsThreshold =
+        summary.totals.statements.pct >= args.coverage &&
+        summary.totals.functions.pct >= args.coverage &&
+        summary.totals.branches.pct >= args.coverage;
 
-    const guidance = normalizePromptSections(
-      collectPromptSections(["bulk-tests"])
-    );
+      const weakest = [...summary.files]
+        .sort((a, b) => a.statements - b.statements)
+        .slice(0, 10);
 
-    const payload = {
-      basePath: path.relative(getWorkspaceRoot(), repoRoot) || ".",
-      target: args.coverage,
-      meetsThreshold,
-      totals: summary.totals,
-      weakest,
-      guidance,
-    };
+      const guidance = normalizePromptSections(
+        collectPromptSections(["bulk-tests"])
+      );
 
-    return {
-      content: [
-        {
-          type: "text",
-          text: JSON.stringify(payload, null, 2),
-        },
-      ],
-    } satisfies ContentResult;
-  },
-};
+      const payload = {
+        basePath: path.relative(getWorkspaceRoot(), repoRoot) || ".",
+        target: args.coverage,
+        meetsThreshold,
+        totals: summary.totals,
+        weakest,
+        guidance,
+      };
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(payload, null, 2),
+          },
+        ],
+      } satisfies ContentResult;
+    },
+  };
 
 export const readmeImprovementTool: Tool<
   undefined,
@@ -304,9 +317,7 @@ export const readmeImprovementTool: Tool<
   parameters: readmeImprovementSchema,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   execute: async (input, _context): Promise<ContentResult> => {
-    const args = readmeImprovementSchema.parse(
-      input as ReadmeImprovementArgs
-    );
+    const args = readmeImprovementSchema.parse(input as ReadmeImprovementArgs);
     const repoRoot = await resolveRepoRoot(args.basePath);
 
     const analysis = analyzeRepo(repoRoot);

@@ -13,6 +13,7 @@ import {
 
 export * from "./tools";
 export * from "./codex-tools";
+export * from "./generateMcpModule";
 
 const codexToolList = [
   documentObjectTool,

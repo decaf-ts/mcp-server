@@ -2,10 +2,7 @@ import type { Resource } from "fastmcp";
 import type { ResourceAsset } from "../../types";
 import { moduleRegistry } from "../moduleRegistry";
 import { getWorkspaceRoot } from "../workspace";
-import {
-  buildObjectPrompts,
-  discoverDocPrompts,
-} from "../prompts/prompts";
+import { buildObjectPrompts, discoverDocPrompts } from "../prompts/prompts";
 
 function toResource(asset: ResourceAsset): Resource<undefined> {
   return {
@@ -13,7 +10,21 @@ function toResource(asset: ResourceAsset): Resource<undefined> {
     uri: asset.uri,
     description: asset.description ?? asset.title,
     mimeType: asset.mimeType,
-    load: () => asset.load(),
+    load: async () => {
+      const res = await asset.load();
+      // asset.load may return a ContentResult or a Promise of ContentResult; ensure we return ResourceResult-like object
+      if ((res as any)?.content) {
+        const cr = res as any;
+        // If ContentResult, convert to simple text result expected by Resource.load consumers
+        return {
+          text: Array.isArray(cr.content)
+            ? cr.content.map((c: any) => c.text).join("\n")
+            : String(cr),
+        };
+      }
+      // fallback for objects with text
+      return res as any as { text: string };
+    },
   };
 }
 

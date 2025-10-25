@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TypeScript workspace template For Developers</title>
+
+  <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="./build/entry.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,400,700|Inconsolata,700" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+  <link type="text/css" rel="stylesheet" href="https://jmblog.github.io/color-themes-for-google-code-prettify/themes/tomorrow-night.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/app.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/iframe.css">
+  <link type="text/css" rel="stylesheet" href="">
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+  
+</head>
+
+
+
+<body class="layout small-header">
+    <div id="stickyNavbarOverlay"></div>
+    
+
+<div class="top-nav">
+    <div class="inner">
+        <a id="hamburger" role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+        <div class="logo">
+            
+             
+                <a href="index.html">
+                    <h1 class="navbar-item">ts-template</h1>
+                </a>
+            
+        </div>
+        <div class="menu">
+            
+            <div class="navigation">
+                <a
+                    href="index.html"
+                    class="link"
+                >
+                    Documentation
+                </a>
+                
+                <div class="dropdown is-hoverable is-right">
+                    <a class="dropdown-trigger link">
+                        Tutorials
+                        <i class="fas fa-chevron-down fa-xs"></i>
+                    </a>
+                    <div class="dropdown-menu">
+                        <div class="dropdown-content">
+                        
+                            <a class="dropdown-item" href="tutorial-Contributing.html">
+                                Contributing
+                            </a>
+                        
+                            <a class="dropdown-item" href="tutorial-Documentation.html">
+                                Documentation
+                            </a>
+                        
+                            <a class="dropdown-item" href="tutorial-For Developers.html">
+                                For Developers
+                            </a>
+                        
+                        </div>
+                    </div>
+                </div>
+                
+                 
+                    
+                        <a
+                            class="link user-link "
+                            href="workdocs/reports/html/test-report.html"
+                        >
+                            Test Results
+                        </a>
+                    
+                        <a
+                            class="link user-link "
+                            href="workdocs/reports/coverage"
+                        >
+                            Test Coverage
+                        </a>
+                    
+                        <a
+                            class="link user-link "
+                            href="https://github.com/decaf-ts/ts-workspace#readme"
+                        >
+                            Github Repository
+                        </a>
+                    
+                        <a
+                            class="link user-link "
+                            href="https://github.com/decaf-ts"
+                        >
+                            Github Profile
+                        </a>
+                    
+                
+                
+            </div>
+        </div>
+    </div>
+</div>
+    <div id="main">
+        <div
+            class="sidebar tutorials"
+            id="sidebarNav"
+        >
+            
+                <div class="search-wrapper">
+                    <input id="search" type="text" placeholder="Search docs..." class="input">
+                </div>
+            
+            <nav>
+                
+                    <div class="category"><h3>Tutorials</h3><ul><li><a href="tutorial-Contributing.html">Contributing</a></li><li><a href="tutorial-Documentation.html">Documentation</a></li><li><a href="tutorial-For Developers.html">For Developers</a></li></ul></div>
+                
+            </nav>
+        </div>
+        <div class="core" id="main-content-wrapper">
+            <div class="content">
+                <header class="page-title">
+                    <p>Tutorial</p>
+                    <h1>For Developers</h1>
+                </header>
+                <section>
+
+<article>
+    <h2><strong><em>Initial Setup</em></strong></h2>
+<h4>if you use GitHub</h4>
+<p>create a new project using this one as a template.</p>
+<p>clone it <code>git clone &lt;project&gt;</code> and navigate to the root folder <code>cd &lt;project&gt;</code></p>
+<p>add a <code>.token</code> file containing your access token to the git repository (allows for git opts to work seamlessly).</p>
+<p>run <code>npm run set-git-auth</code> to update your repo's git config to include the token</p>
+<h4>If your project has private dependencies or publishes to private npm registries, create an <code>.npmrc</code> containing:</h4>
+<pre class="prettyprint source lang-text"><code>@&lt;scope1>:registry=https://&lt;ADDRESS>.com/api/v4/packages/npm/
+@&lt;scope2>:registry=https://&lt;ADDRESS>.&lt;DOMAIN>.com/api/v4/packages/npm/
+//&lt;ADDRESS>.&lt;DOMAIN>.com/:_authToken=${TOKEN}
+//&lt;ADDRESS>.&lt;DOMAIN>.com/api/v4/groups/&lt;GROUP_ID>/packages/npm/:_authToken=${TOKEN}
+//&lt;ADDRESS>.&lt;DOMAIN>.com/api/v4/projects/&lt;PROJECT_ID>/packages/npm/:_authToken=${TOKEN}
+</code></pre>
+<p>Changing:</p>
+<ul>
+<li>
+<ADDRESS> to `gitlab` or `github` (or other);
+</li>
+<li><DOMAIN> to your domain if any (if you are using plain gitlab or GitHub, remove &quot;<DOMAIN>&quot; and the extra dot);</li>
+<li>&lt;GROUP_ID&gt; to your project's group id (if any). otherwise remove this line</li>
+<li>&lt;PROJECT_ID&gt; to your project's id</li>
+</ul>
+<h3>Installation</h3>
+<p>Run <code>npm install</code> (or <code>npm run do-install</code> if you have private dependencies and a <code>.token</code> file) to install the dependencies:</p>
+<p>If this is the first time you are running this command, it will also (according to your choices:</p>
+<ul>
+<li>update this repository's dependencies to their latest version;</li>
+<li>creates the various token files which you can leave empty unless you have private dependencies or publish to private registries</li>
+<li>delete the <code>postinstall</code> script from <code>package.json</code>;</li>
+<li>try to commit the updated <code>package.json</code> and deleted files (having ssh access helps here);</li>
+</ul>
+<h3>Scripts</h3>
+<p>The following npm scripts are available for development:</p>
+<ul>
+<li><code>do-install</code> - sets a <code>TOKEN</code> environment variable to the contents of <code>.token</code> and runs npm install (useful when you
+have private dependencies);</li>
+<li><code>update-scripts</code>: will pull the GitHub actions, templates, and style configs from the <a href="https://github.com/decaf-ts/ts-workspace">ts-workspace</a> repository, overwriting the existing.</li>
+<li><code>on-first-run</code>: will run the initial setup script,</li>
+<li><code>set-git-auth</code> - change git config to include the token (no longer requires manual auth). <em><strong>Only run once per repository</strong></em>;</li>
+<li><code>postinstall</code> - will run only on the first installation to trigger the dep update. Will self-delete;</li>
+<li><code>flash-forward</code> - updates all dependencies. Take care, This may not be desirable is some cases;</li>
+<li><code>reset</code> - updates all dependencies. Take care, This may not be desirable is some cases;</li>
+<li><code>build</code> - builds the code (via gulp <code>gulpfile.js</code>) in development mode (generates <code>lib</code> and <code>dist</code> folder);</li>
+<li><code>build:prod</code> - builds the code (via gulp <code>gulpfile.js</code>) in production mode (generates <code>lib</code> and <code>dist</code> folder);</li>
+<li><code>test</code> - default project test script, defaults to <code>test:unit</code>;</li>
+<li><code>test:unit</code> - runs unit tests;</li>
+<li><code>test:integration</code> - runs it tests;</li>
+<li><code>test:all</code> - runs all tests;</li>
+<li><code>test:circular</code> - tests for circular dependencies;</li>
+<li><code>coverage</code> - runs all tests, calculates coverage (html/csv), generates a test report (HTML and junit) and generates badges for readme;</li>
+<li><code>prepare-pr</code>: same as prepare-release,</li>
+<li><code>lint</code> - runs es lint on the code folder;</li>
+<li><code>lint-fix</code> - tries to auto-fix the code folder;</li>
+<li><code>prepare-release</code> - defines the commands to run prior to a new tag (defaults to linting, building production code,
+running tests and documentation generation);</li>
+<li><code>release</code> - triggers a new tag being pushed to master (via <code>./bin/tag_release.sh</code>);</li>
+<li><code>clean-publish</code> - cleans the package.json for publishing;</li>
+<li><code>drawings</code> - compiles all DrawIO <code>*.drawio</code> files in the <code>workdocs/drawings</code> folder to png and moves them to
+the <code>workdocs/resources</code> folder;</li>
+<li><code>uml</code> - compiles all PlantUML <code>*.puml</code> files in the <code>workdocs/uml</code> folder to png and moves them to
+the <code>workdocs/resources</code> folder;</li>
+<li><code>docs</code> - compiles all the coverage, drawings, uml, jsdocs, and md docs into a readable web page under <code>./docs</code>. Will be made available at <a href="https://decaf-ts.github.io/ts-workspace">GitHub Pages</a>;</li>
+<li><code>publish-docs</code> - publishes the content of <code>./workdocs/confluence</code> to confluence according to the config at <code>./workdocs/confluence/.markdown-confluence.json</code>.
+Uses <a href="https://markdown-confluence.com/introduction.html">markdown-confluence</a>. Check their documentation for configuration details;</li>
+</ul>
+<h2>Linting</h2>
+<p>This repo comes with eslint + prettier preconfigured to the default standards.</p>
+<p>Please configure your IDE to recognize these files and perform automatic validation and fixes on save:</p>
+<ul>
+<li>Webstorm:
+<ul>
+<li>eslint recommended setup preconfigured under <code>.idea/jsLinters/eslint.xml</code></li>
+<li>prettier recommended setup preconfigured under <code>.idea/prettier.xml</code></li>
+</ul>
+</li>
+<li>VSCode(ium):
+<ul>
+<li>eslint recommended setup preconfigured under <code>.vscode/settings.json</code></li>
+<li>prettier recommended setup preconfigured under <code>.vscode/settings.json</code></li>
+</ul>
+</li>
+</ul>
+<h2>Testing</h2>
+<p>Preconfigured Jest based testing:</p>
+<ul>
+<li><code>npm run test</code> - default repository test script. defaults to <code>test:unit</code>;</li>
+<li><code>npm run test:unit</code> - unit tests under the <code>tests/unit</code> folder without coverage;</li>
+<li><code>npm run test:all</code> - include a dist/bundle test under <code>tests/bundling</code> (helps with circular dependencies dist test);</li>
+<li><code>npm run test:bundling</code> - integration tests under the <code>tests/integration</code> folder;</li>
+<li><code>npm run test:circular</code> - stores coverage results under <code>workdocs/coverage</code>;</li>
+<li><code>npm run coverage</code> - stores coverage &amp; test reports under <code>workdocs/reports</code>;</li>
+<li>Coverage and test results will become part of exported docs;</li>
+<li>ignores <code>cli.ts</code> from coverage since that is an executable file;</li>
+<li>uses <code>jest.config.ts</code> as its base config;</li>
+<li>uses <code>workdocs/reports/jest.coverage.config.ts</code> as its base config;</li>
+<li>defines the coverage threshold in <code>workdocs/reports/jest.coverage.config.ts</code>;</li>
+</ul>
+<h2>Documentation</h2>
+<p>The repository proposes a <a href="./Documentation.md">way to generate documentation</a> that while still not ideal, produces very consistent results.</p>
+<p>There are 3 steps in generating the documentation (automated in CI):</p>
+<ul>
+<li><code>npm run drawings</code> - generates png files from each drawing in the <code>workdocs/drawings</code> folder and moves them to the <code>workdocs/resources</code> folder (requires Docker);</li>
+<li><code>npm run uml</code> - generates png files from each PlantUML diagram in the <code>workdocs/uml</code> folder and moves them to the <code>workdocs/resources</code> folder (requires Docker);</li>
+<li><code>npm run docs</code> - this has several stages, defined under the <code>gulp docs</code> (gulpfile.js):
+<ul>
+<li>compiles the Readme file via md compile:
+<ul>
+<li>enables keeping separate files for sections that are then joined into a single file;</li>
+<li>Allows keeping specific files in the jsdoc tutorial folder so they show up on their own menu;</li>
+</ul>
+</li>
+<li>compiles the documentation from the source code using jsdoc:
+<ul>
+<li>uses the better docs template with the category and component plugins</li>
+<li>uses the mermaid jsdoc plugin to imbue uml diagrams in the docs</li>
+<li>includes a nav link to the test coverage results;</li>
+</ul>
+</li>
+<li>copies the jsdoc and mds to <code>/docs</code>;</li>
+<li>copies the <code>./workdocs/{drawings, uml, assets, resources}</code> to <code>./docs</code>;</li>
+</ul>
+</li>
+</ul>
+<p>The produced <code>docs</code> folder contains the resulting documentation;</p>
+<h2>Continuous Integration/Deployment</h2>
+<p>While the implementation for gitlab and GitHub are not perfectly matched, they are perfectly usable.</p>
+<p>The template comes with ci/cd for :</p>
+<ul>
+<li>gitlab (with caching for performance):
+<ul>
+<li>stages:
+<ul>
+<li>dependencies: Installs dependencies (on <code>package-lock.json</code> changes, caches node modules);</li>
+<li>build: builds the code (on <code>src/*</code> changes, caches <code>lib</code> and <code>dist</code>);</li>
+<li>test: tests the code (on <code>src/*</code>, <code>test/*</code> changes, caches <code>workdocs/{resources, badges, coverage}</code>);</li>
+<li>deploy:
+<ul>
+<li>deploys to package registry on a tag (public|private);</li>
+<li>deploys docker image to docker registry (private);</li>
+<li>Deploys the documentation to the repository pages;</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>github:
+<ul>
+<li>jest-test: standard <code>install -&gt; build -&gt; test</code> loop;</li>
+<li>jest-coverage: extracts coverage from the tests;</li>
+<li>codeql-analysis: Code quality analysis;</li>
+<li>snyk-scan: Vulnerability scanning</li>
+<li>pages: builds the documentation and deploys to GitHub pages</li>
+<li>release-on-tag: issues a release when the tag does not contain <code>-no-ci</code> string</li>
+<li>publish-on-release: publishes to package registry (following the release) when the tag does not contain the <code>-no-ci</code> string</li>
+<li>Requires Variables:
+<ul>
+<li>CONSECUTIVE_ACTION_TRIGGER: secret to enable actions to trigger other actions;</li>
+<li>NPM_TOKEN: npm registry token</li>
+</ul>
+</li>
+<li>CI Pages Setup:
+<ul>
+<li>Enable Pages via a GitHub action: <img src="../assets/gh-pages-by-action.png" alt="pages-via-action"></li>
+<li>Secure Workflows via GitHub action: <img src="../assets/gh-allow-workflows.png" alt="secure-workflows"></li>
+<li>Allow GitHub pages via GitHub action for tags: <img src="../assets/gh-environment-rules.png" alt="environment-rules"></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3>Releases</h3>
+<p>This repository automates releases in the following manner:</p>
+<ul>
+<li>run <code>npm run release -- &lt;major|minor|patch|version&gt; &lt;message&gt;</code>:
+<ul>
+<li>if arguments are missing, you will be prompted for them;</li>
+</ul>
+</li>
+<li>it will run <code>npm run prepare-release</code> npm script;</li>
+<li>it will commit all changes;</li>
+<li>it will push the new tag;</li>
+</ul>
+<p>If publishing to a private repo's npm registry, make sure you add to your <code>package.json</code>:</p>
+<pre class="prettyprint source lang-json"><code>{
+  &quot;publishConfig&quot;: {
+    &quot;&lt;SCOPE>:registry&quot;: &quot; https://&lt;REGISTRY>/api/v4/projects/&lt;PROJECT_ID>/packages/npm/&quot;
+  }
+}
+</code></pre>
+<p>Where:</p>
+<ul>
+<li><code>&lt;SCOPE&gt;</code> - Is the scope of your package;</li>
+<li><code>&lt;REGISTRY&gt;</code> - your registry host;</li>
+<li><code>&lt;PROJECT_ID&gt;</code> - you project ID number (easy to grab via UI in gitlab or by
+running <code>$(&quot;meta[name=octolytics-dimension-repository_id]&quot;).getAttribute('content')</code> in the repository page in github);</li>
+</ul>
+<h3>Publishing</h3>
+<p>Unless the <code>-no-ci</code> flag is passed in the commit message to the <code>npm run release</code> command, publishing will be handled
+automatically by github/gitlab (triggered by the tag).</p>
+<p>When the <code>-no-ci</code> flag is passed then you can:</p>
+<ul>
+<li>run <code>npm run publish</code>. This command assumes :
+<ul>
+<li>you have previously run the <code>npm run release</code>;</li>
+<li>you have you publishing properly configured in <code>npmrc</code> and <code>package.json</code>;</li>
+<li>The token for any special access required is stored in the <code>.token</code> file;</li>
+</ul>
+</li>
+</ul>
+<h3>Repository Structure</h3>
+<pre class="prettyprint source"><code>ts-workspace
+│
+│   .confluence-token               &lt;-- stores confluence access token
+│   .dockerignore                   &lt;-- Defines files by docker in the build image
+│   .dockeruser                     &lt;-- stores docker registry user
+│   .dockertoken                    &lt;-- stores docker registry access token
+│   .gitignore                      &lt;-- Defines files ignored to git
+│   .gitlab-ci.yml                  &lt;-- CI behaviour for gitlab
+│   .npmignore                      &lt;-- Defines files ignored by npm
+│   .nmprc                          &lt;-- Defines the Npm registry for this package
+│   .nmptoken                       &lt;-- Defines access token for the Npm registry for this package
+│   .prettierrc                     &lt;-- style definitions for the project
+│   .snyk                           &lt;-- vulnerability scan (via snyk) config
+│   .token                          &lt;-- token for dependencies in private registries
+│   .eslint.config.js               &lt;-- linting for the project
+│   gulpfile.js                     &lt;-- Gulp build scripts. used for building na other features (eg docs)
+│   jest.config.ts                  &lt;-- Tests Configuration file
+│   LICENCE.md                      &lt;-- Licence disclamer
+│   package.json
+│   package-lock.json
+│   README.md                       &lt;-- Readme File dynamically compiled from 'workdocs' via the 'docs' npm script
+│   tsconfig.json                   &lt;-- Typescript config file. Is overriden in 'gulpfile.js'
+│
+└───.github
+│   │   ...                         &lt;-- github workflows and templates
+│
+└───.run
+│   │   ...                         &lt;-- IDE run scripts for WebStorm
+│
+│└───.vscode
+│   │   ...                         &lt;-- IDE run scripts and configs for VSCode(ium)
+│
+└───bin
+│   │───tag_release.cjs             &lt;-- Script to help with releases
+│   │───template-setup.cjs          &lt;-- Script that runs on first npm install and configures the repo
+│   └───update-scripts.cjs          &lt;-- Retrieves the most updated configuration files from the original repository
+└───dist
+│   │   ...                         &lt;-- Dinamically generated folder containing the bundles for distribution
+│
+└───docs
+│   │   ...                         &lt;-- Dinamically generated folder, containing the compiled documentation for this repository. generated via the 'docs' npm script
+│
+└───lib
+│   |   ...                         &lt;-- Dinamically generated folder containing the compiled code
+│
+└───src
+│   │   ...                         &lt;-- Source code for this repository
+│
+└───tests
+│   │───bundling                    &lt;-- Tests the result of the produced bundle
+│   │───unit                        &lt;-- Unit tests
+│   └───integration                 &lt;-- Integration tests
+│
+└───workdocs                        &lt;-- Folder with all pre-compiled documentation
+    │───assets                      &lt;-- Documentation asset folder
+    │───confluence                  &lt;-- folder containing specific documentation to be synced with a confluence page
+    │───drawings                    &lt;-- Drawio drawings that are converted to the resources folder dynamically
+    │───prompts                     &lt;-- Used AI prompts (great for documentation and testing)
+    │───reports                     &lt;-- Folder storing generated content (compiled uml, drawio, test reports, etc)
+    │   └───coverage                &lt;-- Auto generated coverage results (report ready html)
+    │   └───data                    &lt;-- folder used as temp while genrating reports wiht attachements
+    │   └───html                    &lt;-- test results (jest-html-reporters) complete test report with attachements
+    │   └───junit                   &lt;-- test results (junit xml)
+    │   └───jest.coverage.config.ts &lt;-- jest config collecting coverage and exporting test results (extends base config)
+    │───resources                   &lt;-- Folder storing generated content (compiled uml, drawio, etc)
+    │───tutorials                   &lt;-- Tutorial folder (will show up on tutorial section in generated documentation)
+    │───uml                         &lt;-- folder containing puml files to be compiled along with the documentation
+    │   ...                         &lt;-- Categorized *.md files that are merged to generate the final readme (via md compile)
+    │   jsdocs.json                 &lt;-- jsdoc Documentation generation configuration file
+    │   Readme.md                   &lt;-- Entry point to the README.md (will import other referenced md files)
+    │   readme-md.json              &lt;-- md Documentation generation configuration file for the README.md file
+</code></pre>
+<h2>IDE Integrations</h2>
+<h3>Visual Studio Code (VSCode)</h3>
+<p>For an optimal development experience in <strong>VSCode</strong>, we recommend installing the following extensions:</p>
+<ul>
+<li><a href="https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint">ESLint</a> – Linting made easy and integrated.</li>
+<li><a href="https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode">Prettier</a> – Code formatting with style.</li>
+<li><a href="https://marketplace.visualstudio.com/items?itemName=Orta.vscode-jest">Jest</a> – Smooth integration for running and debugging tests.</li>
+</ul>
+<p>We've included a pre-configured <code>settings.json</code> that ensures:</p>
+<ul>
+<li><strong>Linting and formatting</strong> are automatically applied on file save.</li>
+<li><strong>Jest</strong> works seamlessly with your test suite out of the box.</li>
+</ul>
+<h4>Tasks &amp; Launchers</h4>
+<p>Common tasks like <code>build</code>, <code>test</code>, and others are pre-configured as <strong>VSCode Tasks</strong> and <strong>Launch Configurations</strong>.</p>
+<p>To access and run them:</p>
+<ul>
+<li>Open the Command Palette (<code>Cmd/Ctrl + Shift + P</code>) and select <code>Tasks: Run Task</code>.</li>
+<li>Or go to the <strong>Run and Debug</strong> panel, choose a configuration from the dropdown, and press ▶️.</li>
+</ul>
+<hr>
+<h3>WebStorm</h3>
+<p>For <strong>WebStorm</strong> users, everything comes integrated right out of the box 🎉<br>
+Common commands for builds, tests, and documentation generation are available in the <strong>Run/Debug configurations</strong> dropdown for quick access and execution via:</p>
+<ul>
+<li>
+<p>Jest integration:</p>
+<ul>
+<li><code>tests/Unit Tests</code> - Runs all unit tests (analog to <code>test:unit</code>)</li>
+<li><code>tests/Integration Tests</code> - Runs all integration tests (analog to <code>test:integration</code>)</li>
+<li><code>tests/Bundling Tests</code> - Runs the dist and bundling tests (analog to <code>test:bundling</code>)</li>
+<li><code>All Tests</code> - Runs all tests (analog to <code>test:all</code>)</li>
+</ul>
+</li>
+<li>
+<p>Node integration:</p>
+<ul>
+<li><code>repo/docs</code> - Builds documentation (analog to <code>docs</code>)</li>
+<li><code>repo/coverage</code> - runs <code>test:all</code>, collects coverage (csv, HTML), generates test reports (junit, HTML) (analog to <code>coverage</code>)</li>
+<li><code>repo/uml</code> - builds uml into png files (analog to <code>uml</code>)</li>
+<li><code>repo/test:circular</code> - test code for circular dependencies (analog to <code>test:circular</code>)</li>
+<li><code>repo/lint-fix</code> - tries to fix linting issues (analog to <code>lint-fix</code>)</li>
+<li><code>repo/drawings</code> - compiles draw.io files to png (one per page) (analog to <code>drawings</code>)</li>
+<li><code>repo/flash-forward</code> - updates all dependencies to latest versions (analog to <code>flash-forward</code>)</li>
+<li><code>repo/update-scripts</code> - runs cli to update repo's configs (CI, Doc boilerplate, Linting, Style, etc) via it's template repository (analog to <code>drawings</code>)</li>
+<li><code>build:prod</code> - <code>build</code>s code in production mode (minify, uglify, doc extraction, and no source-map for bundled production)</li>
+<li><code>build</code> - <code>build</code>s code in development mode</li>
+</ul>
+</li>
+</ul>
+<h2>Considerations</h2>
+<ul>
+<li>Setup for node 20, but will work at least with 16;</li>
+<li>Requires docker to build documentation (drawings and PlantUML)</li>
+</ul>
+</article>
+
+</section>
+
+            </div>
+            
+        </div>
+        <div id="side-nav" class="side-nav">
+        </div>
+    </div>
+<script src="scripts/app.min.js"></script>
+<script>PR.prettyPrint();</script>
+<script src="scripts/linenumber.js"> </script>
+
+<script src="scripts/search.js"> </script>
+
+
+</body>
+</html>

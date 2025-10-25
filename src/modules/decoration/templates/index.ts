@@ -1,19 +1,8 @@
-import type { TemplateAsset } from "../../../types";
-
-export const templates: TemplateAsset[] = [
+export const templates = [
   {
-    id: "decoration.template.decorator",
-    title: "Decorator Boilerplate",
-    description: "Scaffold describing the shape of a new decorator function.",
-    content: `import { createDecorator } from "@decaf-ts/decoration";
-
-export const {{decoratorName}} = createDecorator({
-  target: "{{target}}",
-  description: "{{description}}",
-  run(context) {
-    // TODO: implement decorator behavior
-  },
-});`,
-    placeholders: ["decoratorName", "target", "description"],
-  },
-];
+    "name": "readme-template",
+    "description": "README as guidance",
+    "uriTemplate": "file:///tmp/mcp-gen-238zDA/decoration/README.md",
+    "mimeType": "text/markdown"
+  }
+] as const;

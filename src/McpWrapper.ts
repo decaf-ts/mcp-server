@@ -121,15 +121,23 @@ export class McpWrapper extends LoggedClass {
   private async boot() {
     const log = this.log.for(this.boot);
     let server = this.mcp;
-    for (const module of modules) {
-      if (module.includes("@decaf-ts/mcp")) {
+    // discover modules by crawling basePath
+    const moduleFiles = this.crawl(
+      path.resolve(this.basePath),
+      this.crawlLevels
+    );
+    for (const moduleFile of moduleFiles) {
+      if (moduleFile.includes("@decaf-ts/mcp")) {
         continue;
       }
       try {
-        const res = await this.load(server, module);
+        const res = await this.load(server, moduleFile);
         server = res.mcp;
+        this.modules[res.package] = moduleFile;
       } catch (e: unknown) {
-        log.error(`Failed to load MCP configs for ${module}: ${e}`);
+        log.error(
+          `Failed to load MCP configs for ${moduleFile}: ${e instanceof Error ? e.message : e}`
+        );
       }
     }
     console.log(

@@ -24,6 +24,7 @@ import {
   selectPrompt,
 } from "../prompts/prompts";
 import type { ApplyCodeChangeArgs, DocumentCodeArgs } from "../types";
+import { generateMcpModuleTool } from "./generateMcpModule";
 
 export function buildAnalyzeRepositoryTool(): Tool<
   undefined,
@@ -203,7 +204,6 @@ export function buildPlanFeatureTool(): Tool<
     },
   };
 }
-
 
 export const documentCodeTool: Tool<undefined, typeof documentCodeSchema> = {
   annotations: {

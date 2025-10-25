@@ -5,7 +5,11 @@ import { pathToFileURL } from "url";
 import { findModuleDirs } from "./validation";
 
 export type Provenance = { moduleName: string; modulePath: string };
-export type AggregationConflict = { key: string; existing: Provenance; incoming: Provenance };
+export type AggregationConflict = {
+  key: string;
+  existing: Provenance;
+  incoming: Provenance;
+};
 
 export type AggregationResult<T = any> = {
   prompts: Array<T & { provenance: Provenance }>;
@@ -16,7 +20,13 @@ export type AggregationResult<T = any> = {
 };
 
 const SUBFOLDERS = ["prompts", "resources", "templates", "tools"];
-const INDEX_CANDIDATES = ["index.ts", "index.tsx", "index.js", "index.cjs", "index.mjs"];
+const INDEX_CANDIDATES = [
+  "index.ts",
+  "index.tsx",
+  "index.js",
+  "index.cjs",
+  "index.mjs",
+];
 
 function findIndexFile(folder: string): string | undefined {
   for (const c of INDEX_CANDIDATES) {
@@ -40,7 +50,47 @@ function makeKeyForItem(item: any): string {
   }
 }
 
-async function loadArrayFromIndex(filePath: string): Promise<any[] | undefined> {
+async function loadArrayFromIndex(
+  filePath: string
+): Promise<any[] | undefined> {
+  // Prefer a fast, static parse of the first array literal found in the file.
+  try {
+    const content = fs.readFileSync(filePath, "utf8");
+    const start = content.indexOf("[");
+    if (start !== -1) {
+      let depth = 0;
+      let end = -1;
+      for (let i = start; i < content.length; i++) {
+        const ch = content[i];
+        if (ch === "[") depth++;
+        else if (ch === "]") {
+          depth--;
+          if (depth === 0) {
+            end = i;
+            break;
+          }
+        }
+      }
+      if (end !== -1) {
+        const arrText = content.slice(start, end + 1);
+        try {
+          return JSON.parse(arrText);
+        } catch (e) {
+          const normalized = arrText.replace(/'(?:\\'|[^'])*'/g, (m) =>
+            m.replace(/'/g, '"')
+          );
+          try {
+            return JSON.parse(normalized);
+          } catch (e2) {
+            // fallthrough to import attempt below
+          }
+        }
+      }
+    }
+  } catch (e) {
+    // ignore static parse errors and fall back to import
+  }
+
   try {
     const fileUrl = pathToFileURL(filePath).href;
     const mod = await import(fileUrl);
@@ -50,15 +100,17 @@ async function loadArrayFromIndex(filePath: string): Promise<any[] | undefined> 
       if (Array.isArray(val)) return val;
     }
     // default export check
-    if (Array.isArray(mod.default)) return mod.default;
+    if (Array.isArray((mod as any).default)) return (mod as any).default;
     return undefined;
   } catch (err) {
-    // propagate error for caller to record
-    throw err;
+    // fallback: if import fails, try to static-parse again (already attempted) and finally return undefined
+    return undefined;
   }
 }
 
-export async function aggregateModules(repoRoot: string): Promise<AggregationResult> {
+export async function aggregateModules(
+  repoRoot: string
+): Promise<AggregationResult> {
   const dirs = findModuleDirs(repoRoot);
   const master = {
     prompts: [] as any[],
@@ -125,12 +177,15 @@ export function aggregateModulesSync(repoRoot: string) {
   p.then((r) => {
     result = r;
     done = true;
-  }).catch((e) => { throw e; });
+  }).catch((e) => {
+    throw e;
+  });
   // spin-wait (acceptable in small dev scripts)
   const until = Date.now() + 5000;
-  while (!done && Date.now() < until) {
-     
-  }
-  if (!done) throw new Error("aggregateModulesSync: timeout waiting for async aggregation");
+  while (!done && Date.now() < until) {}
+  if (!done)
+    throw new Error(
+      "aggregateModulesSync: timeout waiting for async aggregation"
+    );
   return result as AggregationResult;
 }

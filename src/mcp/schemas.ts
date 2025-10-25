@@ -1,26 +1,25 @@
 import { z } from "zod";
-import type { Tool } from "fastmcp";
 
 export const analyzeRepoSchema = z
   .object({
     repoPath: z
-      .string({
-        description:
-          "Relative or absolute path to the target repository inside this monorepo, e.g. './decoration'.",
-      })
-      .min(1, "repoPath is required"),
+      .string()
+      .min(1, "repoPath is required")
+      .describe(
+        "Relative or absolute path to the target repository inside this monorepo, e.g. './decoration'."
+      ),
     includeTests: z
-      .boolean({
-        description:
-          "If true, analyze the tests directory (if present) to derive expected behaviors.",
-      })
-      .default(true),
+      .boolean()
+      .default(true)
+      .describe(
+        "If true, analyze the tests directory (if present) to derive expected behaviors."
+      ),
     includeDocs: z
-      .boolean({
-        description:
-          "If true, analyze README.md and docs directories to extract documented features.",
-      })
-      .default(true),
+      .boolean()
+      .default(true)
+      .describe(
+        "If true, analyze README.md and docs directories to extract documented features."
+      ),
   })
   .strict()
   .describe(
@@ -30,11 +29,11 @@ export const analyzeRepoSchema = z
 export const enumerateCapabilitiesSchema = z
   .object({
     repoPath: z
-      .string({
-        description:
-          "Relative or absolute path to the target repository to enumerate developer-facing capabilities.",
-      })
-      .min(1, "repoPath is required"),
+      .string()
+      .min(1, "repoPath is required")
+      .describe(
+        "Relative or absolute path to the target repository to enumerate developer-facing capabilities."
+      ),
   })
   .strict()
   .describe(
@@ -44,23 +43,22 @@ export const enumerateCapabilitiesSchema = z
 export const planFeatureSchema = z
   .object({
     feature: z
-      .string({
-        description:
-          "Natural-language description of a developer's requested feature or task to implement using the repository and available MCP tools.",
-      })
-      .min(5, "feature must describe the goal clearly"),
+      .string()
+      .min(5, "feature must describe the goal clearly")
+      .describe(
+        "Natural-language description of a developer's requested feature or task to implement using the repository and available MCP tools."
+      ),
     repoPath: z
-      .string({
-        description:
-          "Target repository path providing the library to use, e.g. './decoration'.",
-      })
-      .default("./decoration"),
+      .string()
+      .default("./decoration")
+      .describe(
+        "Target repository path providing the library to use, e.g. './decoration'."
+      ),
   })
   .strict()
   .describe(
     "Plan which MCP tools to use and in what sequence to implement a requested feature using the repository."
   );
-
 
 export const documentCodeSchema = z
   .object({
@@ -108,10 +106,11 @@ export const coverageTaskSchema = z
   .object({
     basePath: z.string().min(1, "basePath is required"),
     coverage: z
-      .number({ description: "Target coverage percentage" })
+      .number()
       .min(0)
       .max(100)
-      .default(90),
+      .default(90)
+      .describe("Target coverage percentage"),
     dryRun: z.boolean().default(false),
   })
   .strict();

@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// @ts-nocheck
 try {
   require("ts-node").register({ transpileOnly: true });
 } catch (e) {
@@ -7,9 +8,10 @@ try {
 
 (async () => {
   try {
-    const agg = await require("../mcp/aggregateModules.ts").aggregateModules(
-      process.cwd()
-    );
+    const agg =
+      await require("../src/mcp/aggregateModules.ts").aggregateModules(
+        process.cwd()
+      );
     if (agg.conflicts && agg.conflicts.length > 0) {
       console.error("Aggregation conflicts detected:");
       console.error(JSON.stringify(agg.conflicts, null, 2));
