@@ -10,10 +10,10 @@
 Build a small suite of developer tools to extract TypeScript AST objects from files and generate
 or update JSDoc comments per-object using dedicated prompt templates. Deliverables:
 
-- TOOL1: `ast.analysis` — programmatic AST extractor (file → list of AST objects)
-- TOOL2: `jsdoc.generate` — object-level JSDoc suggestion generator driven by prompt templates
-- TOOL3: `file.orchestrator` — runs TOOL1 then TOOL2 for a single file (dry-run / apply modes)
-- TOOL4: `repo.runner` — enumerates repo `.ts` files and runs TOOL3 using heuristics for context
+- TOOL1: `ast.extract` — programmatic AST extractor (file → list of AST objects)
+- TOOL2: `jsdoc.for-object` — object-level JSDoc suggestion generator driven by prompt templates
+- TOOL3: `jsdoc.for-file` — runs TOOL1 then TOOL2 for a single file (dry-run / apply modes)
+- TOOL4: `jsdoc.for-repo` — enumerates repo `.ts` files and runs TOOL3 using heuristics for context
 - Prompt templates and test fixtures under `specs/001-ast-jsdoc-tools/prompts/` and `test-fixtures/`
 
 Primary outcomes: machine-readable reports (JSON), CLI wrappers, unit tests and an integration
