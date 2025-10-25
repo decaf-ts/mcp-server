@@ -124,7 +124,7 @@ US3 (P3) → Requires TOOL2
   - US1 (P1): 8 tasks
   - US2 (P2): 5 tasks
   - US3 (P3): 4 tasks
-  - Polish: 3 tasks
+  - Polish: 8 tasks
 - Parallel Opportunities: 10 tasks
 - Independent Test Criteria: Defined for each user story
 - MVP Scope: User Story 1 (T011-T018)
