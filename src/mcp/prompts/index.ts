@@ -1,3 +1,4 @@
+export * from "./prompts";
 import { InputPrompt } from "fastmcp";
 import { prompts, refreshPrompts } from "./prompts";
 

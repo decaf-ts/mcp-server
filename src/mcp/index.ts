@@ -11,6 +11,10 @@ export { validateModules } from "./validation";
 export { aggregateModules, aggregateModulesSync } from "./aggregateModules";
 export { EnrichCoreWithAggregation } from "./fastmcp-wiring";
 
+// re-export helpers used by tests and other modules
+export { buildDocPrompts } from "./prompts/index";
+export { buildResourceTemplates } from "./templates/index";
+
 export function EnrichCore(server: FastMCP) {
   loadPrompts();
   for (const prompt of promptList) {

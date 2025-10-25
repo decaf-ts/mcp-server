@@ -1,15 +1,9 @@
-import { prompts } from "./prompts/index";
-import { resources } from "./resources/index";
-import { templates } from "./templates/index";
-import { tools } from "./tools/index";
-export { prompts } from "./prompts/index";
-export { resources } from "./resources/index";
-export { templates } from "./templates/index";
-export { tools } from "./tools/index";
-export const modulePackage = {
-  name: "decoration",
-  prompts,
-  resources,
-  templates,
-  tools,
-} as const;
+import { prompts } from './prompts';
+import { resources } from './resources';
+import { templates } from './templates';
+import { tools } from './tools';
+export { prompts } from './prompts';
+export { resources } from './resources';
+export { templates } from './templates';
+export { tools } from './tools';
+export const modulePackage = { name: 'decoration', prompts, resources, templates, tools } as const;

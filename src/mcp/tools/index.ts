@@ -4,6 +4,7 @@ import {
   documentObjectTool,
   readmeImprovementTool,
 } from "./codex-tools";
+import { decoratorTools } from "../decorator-tools";
 const codexToolList = [
   documentObjectTool,
   coverageEnforcerTool,
@@ -34,4 +35,6 @@ export const tools = {
   documentObjectTool,
   coverageEnforcerTool,
   readmeImprovementTool,
+  ...decoratorTools,
 };
+export { decoratorTools };
