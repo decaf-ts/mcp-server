@@ -1,4 +1,4 @@
-[![Banner](./workdocs/assets/Banner.png)](https://decaf-ts.github.io/ts-workspace/)
+![Banner](./workdocs/assets/decaf-logo.svg)
 ## Typescript Template
 
 This repository is meant to provide an enterprise template for any standard Typescript project
@@ -47,9 +47,25 @@ Now you can create new repositories from this template and enjoy having everythi
 - [IDE Integrations](./workdocs/tutorials/For%20Developers.md#ide-integrations)
   - [VSCode(ium)](./workdocs/tutorials/For%20Developers.md#visual-studio-code-vscode)
   - [WebStorm](./workdocs/tutorials/For%20Developers.md#webstorm)
+- [Module Structure](../docs/module-structure.md)
 - [Considerations](./workdocs/tutorials/For%20Developers.md#considerations)
 
+## Coding Principles
 
+- group similar functionality in folders (analog to namespaces but without any namespace declaration)
+- one class per file;
+- one interface per file (unless interface is just used as a type);
+- group types as other interfaces in a types.ts file per folder;
+- group constants or enums in a constants.ts file per folder;
+- group decorators in a decorators.ts file per folder;
+- always import from the specific file, never from a folder or index file (exceptions for dependencies on other packages);
+- prefer the usage of established design patters where applicable:
+  - Singleton (can be an anti-pattern. use with care);
+  - factory;
+  - observer;
+  - strategy;
+  - builder;
+  - etc;
 
 
 ### Related

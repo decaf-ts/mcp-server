@@ -36,7 +36,7 @@
     "lint": "eslint .",
     "lint-fix": "eslint --fix .",
     "prepare-pr": "npm run lint-fix && npm run build:prod && npm run coverage && npm run docs",
-    "prepare-release": "npm run build:prod && npm run coverage && npm run docs",
+    "prepare-release": "npm run build:prod && npm run coverage",
     "release": "./bin/tag-release.sh",
     "clean-publish": "npx clean-publish",
     "drawings": "for FILE in workdocs/drawings/*.drawio; do echo \"converting $FILE to image...\" && docker run --rm -v $(pwd):/data rlespinasse/drawio-export --format png $FILE; done && cp -rf workdocs/drawings/export/* workdocs/resources/",
@@ -141,6 +141,8 @@
   },
   "license": "AGPL-3.0-only",
   "dependencies": {
-    "fastmcp": "^3.20.0"
+    "better-docs": "^2.7.3",
+    "fastmcp": "^3.20.0",
+    "taffydb": "^2.7.3"
   }
 }
