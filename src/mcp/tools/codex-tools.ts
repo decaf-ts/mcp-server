@@ -19,7 +19,6 @@ import {
   WorkspaceError,
 } from "../workspace";
 import {
-  buildObjectPrompts,
   discoverDocPrompts,
   getObjectPromptDependencies,
 } from "../prompts/prompts";

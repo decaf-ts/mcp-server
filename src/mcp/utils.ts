@@ -1,6 +1,5 @@
 import fs from "fs";
 import path from "path";
-import { analyzeRepo } from "./code";
 
 export function readFileSafe(
   filePath: string,
@@ -31,9 +30,7 @@ export function listFilesRecursive(
   return out.sort();
 }
 
-export function deriveCapabilities(
-  analysis: ReturnType<typeof analyzeRepo>
-): string[] {
+export function deriveCapabilities(analysis: any): string[] {
   const cap = new Set<string>();
   // heuristics: if decorators like Decoration, flavouredAs, extend, override appear, add capabilities
   const allDecs = new Set<string>();
@@ -49,3 +46,4 @@ export function deriveCapabilities(
   if (analysis.readme) cap.add("follow-readme-guides");
   return [...cap].sort();
 }
+

@@ -17,14 +17,11 @@ import {
   throwUserError,
   WorkspaceError,
 } from "../workspace";
-import {
-  buildDocumentationPayload,
-  DEFAULT_PROMPT_NAME,
-  discoverDocPrompts,
-  selectPrompt,
-} from "../prompts/prompts";
+// NOTE: prompt helpers (buildDocumentationPayload, discoverDocPrompts, selectPrompt, DEFAULT_PROMPT_NAME)
+// are imported dynamically inside documentCodeTool.execute to avoid creating a static circular import
+// at module load time (moduleRegistry -> modules -> decoration tools -> mcp/tools -> prompts).
+// They will be loaded when the tool executes.
 import type { ApplyCodeChangeArgs, DocumentCodeArgs } from "../types";
-import { generateMcpModuleTool } from "./generateMcpModule";
 
 export function buildAnalyzeRepositoryTool(): Tool<
   undefined,
@@ -236,6 +233,14 @@ export const documentCodeTool: Tool<undefined, typeof documentCodeSchema> = {
     const fileContent = fs.readFileSync(filePath, {
       encoding: args.encoding as BufferEncoding,
     });
+    // dynamically import prompt helpers
+    const promptMod = await import("../prompts/prompts");
+    const {
+      discoverDocPrompts,
+      selectPrompt,
+      DEFAULT_PROMPT_NAME,
+      buildDocumentationPayload,
+    } = promptMod;
     const prompts = discoverDocPrompts(root);
 
     if (!prompts.length) {

@@ -1,0 +1,5 @@
+- Start analyzing dependencies...
+✔ [44/44] Analyze done!
+• Circular Dependencies
+  1) src/mcp/moduleRegistry.ts -> src/modules/index.ts -> src/modules/decoration/index.ts -> src/modules/decoration/tools/index.ts -> src/mcp/tools/tools.ts -> src/mcp/prompts/prompts.ts
+

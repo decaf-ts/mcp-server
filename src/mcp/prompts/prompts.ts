@@ -9,9 +9,14 @@ import {
 import type { DocPrompt } from "../types";
 import { getWorkspaceRoot } from "../workspace";
 import type { PromptAsset } from "../../types";
-import { moduleRegistry } from "../moduleRegistry";
 
 export const prompts: InputPrompt<undefined>[] = [];
+
+// Read registered module packages from a runtime global set by modules/index
+// This avoids importing moduleRegistry at module-eval time which creates circular imports.
+function getRegisteredModulePackages(): any[] {
+  return (globalThis as any).__DECAF_MODULE_PACKAGES__ ?? [];
+}
 
 const OBJECT_PROMPT_DEPENDENCIES: Record<string, readonly string[]> = {
   module: ["doc", "module"],
@@ -119,7 +124,9 @@ function toInputPrompt(asset: PromptAsset): InputPrompt<undefined> {
 }
 
 function buildModulePrompts(): InputPrompt<undefined>[] {
-  return moduleRegistry.listPrompts().map(toInputPrompt);
+  const pkgs = getRegisteredModulePackages();
+  const assets: PromptAsset[] = pkgs.flatMap((p: any) => p.prompts ?? []);
+  return assets.map(toInputPrompt);
 }
 
 export function refreshPrompts(repoPath?: string): InputPrompt<undefined>[] {

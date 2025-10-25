@@ -14,6 +14,7 @@
   "types": "lib/index.d.ts",
   "scripts": {
     "start": "node lib/bin/cli.cjs",
+    "start-dev": "ts-node src/bin/cli.ts",
     "dev": "tsx watch fastmcp-server.ts",
     "do-install": "NPM_TOKEN=$(cat .npmtoken) npm install",
     "update-dependencies": "PREFIX=\"decaf-ts\"; npm ls | grep \"$PREFIX\" | awk -F/ '{print $NF}' | sed 's/@.*//' | xargs -I package npm update @\"$PREFIX\"/package",
@@ -97,6 +98,7 @@
   },
   "homepage": "https://github.com/decaf-ts/mcp-server#readme",
   "devDependencies": {
+    "@decaf-ts/mcp-server": "^0.4.0",
     "@decaf-ts/utils": "latest",
     "@eslint/js": "^9.25.1",
     "@rollup/plugin-commonjs": "^28.0.3",
@@ -139,5 +141,8 @@
     "ts-morph": "^21.0.0",
     "typescript": "^5.6.3"
   },
-  "license": "AGPL-3.0-only"
+  "license": "AGPL-3.0-only",
+  "dependencies": {
+    "fastmcp": "^3.21.0"
+  }
 }

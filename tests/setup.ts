@@ -29,6 +29,12 @@ class MockFastMCP {
     this.templates.push(template);
     return this;
   }
+
+  // Provide a minimal start method so McpWrapper.run can call it during tests
+  start() {
+    // emulate async startup (no-op)
+    return Promise.resolve(this);
+  }
 }
 
 jest.mock("fastmcp", () => ({

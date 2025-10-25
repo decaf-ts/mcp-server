@@ -1,16 +1,6 @@
-import {
-  buildCodexPromptTemplates,
-  codexPromptTemplates,
-} from "./codex-templates";
-import {
-  buildDecorationResourceTemplates,
-  decorationResourceTemplates,
-} from "./resource-templates";
-import {
-  buildWorkspaceResourceTemplates,
-  workspaceResourceTemplates,
-} from "./workspace-templates";
-import type { TemplateAsset } from "../../types";
+import { buildCodexPromptTemplates } from "./codex-templates";
+import { buildDecorationResourceTemplates } from "./resource-templates";
+import { buildWorkspaceResourceTemplates } from "./workspace-templates";
 import { moduleRegistry } from "../moduleRegistry";
 
 export {

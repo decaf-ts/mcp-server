@@ -1,8 +1,8 @@
 import { aggregateModules } from "./aggregateModules";
-import { loadPrompts, promptList } from "./prompts";
-import { toolList } from "./tools";
-import { resources } from "./resources";
-import { buildResourceTemplates } from "./templates";
+import { loadPrompts, promptList } from "./prompts/index";
+import { toolList } from "./tools/index";
+import { resources } from "./resources/index";
+import { buildResourceTemplates } from "./templates/index";
 
 export type FastMCPLike = {
   addPrompt: (p: any) => void;

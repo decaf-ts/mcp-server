@@ -5,19 +5,15 @@ import type {
   TemplateAsset,
   ToolAsset,
 } from "../types";
-import { modulePackages } from "../modules";
 
 type AssetKey = "prompts" | "resources" | "templates" | "tools";
 
 export class ModuleRegistry {
-  // Defensive default: modulePackages may be undefined during circular imports
-  constructor(
-    private readonly packages: ModuleExportPackage[] = Array.isArray(
-      modulePackages
-    )
-      ? (modulePackages as ModuleExportPackage[])
-      : []
-  ) {}
+  constructor(private packages: ModuleExportPackage[] = []) {}
+
+  setPackages(pkgs: ModuleExportPackage[]) {
+    this.packages = Array.isArray(pkgs) ? pkgs : [];
+  }
 
   listPackages(): ModuleExportPackage[] {
     return this.packages;
@@ -47,8 +43,7 @@ export class ModuleRegistry {
 
     for (const pkg of this.packages) {
       if (pkg.status === "disabled") continue;
-      for (const asset of pkg[key] as T[]) {
-        // asset.name is not guaranteed on all asset types; use type-safe fallback
+      for (const asset of (pkg as any)[key] as T[]) {
         const maybeName = (asset as any).name as string | undefined;
         const assetKey =
           (asset && (asset.id ?? maybeName)) || JSON.stringify(asset);
@@ -68,3 +63,7 @@ export class ModuleRegistry {
 }
 
 export const moduleRegistry = new ModuleRegistry();
+
+export function registerModulePackages(pkgs: ModuleExportPackage[]) {
+  moduleRegistry.setPackages(pkgs);
+}

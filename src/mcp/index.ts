@@ -1,8 +1,8 @@
 import { FastMCP } from "fastmcp";
-import { loadPrompts, promptList } from "./prompts";
-import { toolList } from "./tools";
-import { resources } from "./resources";
-import { buildResourceTemplates } from "./templates";
+import { loadPrompts, promptList } from "./prompts/index";
+import { toolList } from "./tools/index";
+import { resources } from "./resources/index";
+import { buildResourceTemplates } from "./templates/index";
 
 export * from "./mcp-module";
 export { default } from "./mcp-module";

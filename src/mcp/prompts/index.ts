@@ -1,7 +1,5 @@
-import type { InputPrompt } from "fastmcp";
+import { InputPrompt } from "fastmcp";
 import { prompts, refreshPrompts } from "./prompts";
-
-export * from "./prompts";
 
 export const promptList: InputPrompt<undefined>[] = prompts;
 

@@ -13,8 +13,6 @@ const generateSchema = z.object({
   includeDocs: z.boolean().default(true),
 });
 
-type GenerateArgs = z.infer<typeof generateSchema>;
-
 export const generateMcpModuleTool: Tool<undefined, typeof generateSchema> = {
   name: "generate-mcp-module",
   description:
