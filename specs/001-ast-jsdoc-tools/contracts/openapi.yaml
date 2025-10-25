@@ -1,0 +1,350 @@
+openapi: 3.0.0
+info:
+  title: AST → JSDoc Tools API
+  version: 1.0.0
+  description: Tools for generating JSDoc from TypeScript AST
+
+paths:
+  /ast/analyze:
+    post:
+      summary: Analyze TypeScript file and extract AST objects (TOOL1)
+      operationId: analyzeFile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnalyzeRequest'
+      responses:
+        '200':
+          description: AST objects extracted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyzeResponse'
+
+  /jsdoc/generate:
+    post:
+      summary: Generate JSDoc for AST object (TOOL2)
+      operationId: generateJsDoc
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateRequest'
+      responses:
+        '200':
+          description: JSDoc generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JsDocSuggestion'
+
+  /file/process:
+    post:
+      summary: Process single file with JSDoc generation (TOOL3)
+      operationId: processFile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProcessFileRequest'
+      responses:
+        '200':
+          description: File processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileReport'
+
+  /repo/process:
+    post:
+      summary: Process repository with JSDoc generation (TOOL4)
+      operationId: processRepo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProcessRepoRequest'
+      responses:
+        '200':
+          description: Repository processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepoReport'
+
+components:
+  schemas:
+    AnalyzeRequest:
+      type: object
+      required:
+        - filePath
+      properties:
+        filePath:
+          type: string
+          description: Path to TypeScript file to analyze
+
+    AnalyzeResponse:
+      type: object
+      required:
+        - astObjects
+      properties:
+        astObjects:
+          type: array
+          items:
+            $ref: '#/components/schemas/AstObject'
+
+    GenerateRequest:
+      type: object
+      required:
+        - astObject
+      properties:
+        astObject:
+          $ref: '#/components/schemas/AstObject'
+        contextHints:
+          type: array
+          items:
+            type: string
+          description: Optional context hints for JSDoc generation
+
+    ProcessFileRequest:
+      type: object
+      required:
+        - filePath
+      properties:
+        filePath:
+          type: string
+        dryRun:
+          type: boolean
+          default: false
+        contextHints:
+          type: array
+          items:
+            type: string
+
+    ProcessRepoRequest:
+      type: object
+      required:
+        - repoRoot
+      properties:
+        repoRoot:
+          type: string
+        sourcePath:
+          type: string
+          description: Optional sub-path within repo
+        dryRun:
+          type: boolean
+          default: false
+        contextMapping:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+
+    AstObject:
+      type: object
+      required:
+        - id
+        - name
+        - kind
+        - location
+        - isExported
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        kind:
+          type: string
+          enum:
+            - class
+            - function
+            - interface
+            - type
+            - enum
+            - constant
+            - module
+            - namespace
+            - decorator
+            - cli-module
+        location:
+          $ref: '#/components/schemas/SourceLocation'
+        isExported:
+          type: boolean
+        signature:
+          type: string
+        parentId:
+          type: string
+        children:
+          type: array
+          items:
+            type: string
+        decorators:
+          type: array
+          items:
+            type: string
+        contextHints:
+          type: array
+          items:
+            type: string
+
+    SourceLocation:
+      type: object
+      required:
+        - filePath
+        - startLine
+        - startColumn
+        - endLine
+        - endColumn
+      properties:
+        filePath:
+          type: string
+        startLine:
+          type: integer
+        startColumn:
+          type: integer
+        endLine:
+          type: integer
+        endColumn:
+          type: integer
+
+    JsDocSuggestion:
+      type: object
+      required:
+        - targetId
+        - summary
+        - tags
+        - needsReview
+        - suggestedDoc
+      properties:
+        targetId:
+          type: string
+        summary:
+          type: string
+        description:
+          type: string
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/JsDocTag'
+        needsReview:
+          type: boolean
+        existingDoc:
+          type: string
+        suggestedDoc:
+          type: string
+
+    JsDocTag:
+      type: object
+      required:
+        - name
+        - value
+      properties:
+        name:
+          type: string
+        value:
+          type: string
+        optional:
+          type: boolean
+
+    FileReport:
+      type: object
+      required:
+        - filePath
+        - timestamp
+        - astObjects
+        - suggestions
+        - stats
+      properties:
+        filePath:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        astObjects:
+          type: array
+          items:
+            $ref: '#/components/schemas/AstObject'
+        suggestions:
+          type: object
+          additionalProperties:
+            type: object
+            required:
+              - suggestion
+              - status
+            properties:
+              suggestion:
+                $ref: '#/components/schemas/JsDocSuggestion'
+              status:
+                type: string
+                enum:
+                  - created
+                  - updated
+                  - unchanged
+                  - failed
+              error:
+                type: string
+        stats:
+          type: object
+          required:
+            - totalObjects
+            - withExistingDocs
+            - suggestionsCreated
+            - suggestionsUpdated
+            - errors
+          properties:
+            totalObjects:
+              type: integer
+            withExistingDocs:
+              type: integer
+            suggestionsCreated:
+              type: integer
+            suggestionsUpdated:
+              type: integer
+            errors:
+              type: integer
+
+    RepoReport:
+      type: object
+      required:
+        - repoRoot
+        - timestamp
+        - fileReports
+        - stats
+      properties:
+        repoRoot:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        fileReports:
+          type: array
+          items:
+            $ref: '#/components/schemas/FileReport'
+        stats:
+          type: object
+          required:
+            - filesProcessed
+            - totalObjects
+            - totalSuggestions
+            - errors
+          properties:
+            filesProcessed:
+              type: integer
+            totalObjects:
+              type: integer
+            totalSuggestions:
+              type: integer
+            errors:
+              type: integer
+        contextRules:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
