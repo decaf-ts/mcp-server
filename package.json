@@ -1,6 +1,6 @@
 {
   "name": "@decaf-ts/mcp-server",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "mcp server for code assistance of decaf-ts projects",
   "type": "module",
   "bin": {
