@@ -5,6 +5,22 @@
 **Status**: Draft  
 **Input**: User description: "$ARGUMENTS"
 
+## Constitution Check *(mandatory)*
+
+Before moving to planning, briefly state whether this spec complies with the project constitution.
+For each principle impacted by the feature, declare one of: `Complies` / `Partial` / `Violates` and add
+one-line justification. If `Partial` or `Violates`, include a short mitigation or migration plan.
+
+Minimum items to cover:
+
+- Code Organization & Module Boundaries: [Complies|Partial|Violates] - [justification]
+- File & Export Conventions: [Complies|Partial|Violates] - [justification]
+- Test-First Quality: [Complies|Partial|Violates] - [justification]
+- Design Patterns: [Complies|Partial|Violates] - [justification]
+- Review/CI/Observability: [Complies|Partial|Violates] - [justification]
+
+If no impact exists for a principle, state `Complies - Not applicable`.
+
 ## User Scenarios & Testing *(mandatory)*
 
 <!--

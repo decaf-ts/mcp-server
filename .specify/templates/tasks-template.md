@@ -52,6 +52,15 @@ description: "Task list template for feature implementation"
 - [ ] T002 Initialize [language] project with [framework] dependencies
 - [ ] T003 [P] Configure linting and formatting tools
 
+### Constitution Check (required)
+
+Before any implementation tasks, add a Constitution Check task that verifies the plan's
+compliance with the repository constitution. This task MUST be visible in Phase 1 and should
+be completed before the Foundational phase starts.
+
+- [ ] T00C Constitution Check: Verify Code Organization, File/Export Conventions, Test-First,
+  Design Patterns, and CI/Review impacts (Complies/Partial/Violates + mitigation plan)
+
 ---
 
 ## Phase 2: Foundational (Blocking Prerequisites)
