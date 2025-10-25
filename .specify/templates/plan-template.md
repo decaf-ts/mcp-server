@@ -31,13 +31,7 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-- **Template Fidelity**: Confirm the feature keeps TypeScript sources in `src/`, re-exports via `src/index.ts`, uses only `tests/{unit,integration,bundling}`, and documents any CLI or API contract shifts.
-- **Dual-Target Distribution**: Show how `npm run build`, `npm run build:prod`, and `npm run test:dist` stay green; note updates required for both `lib/` (CJS/ESM) and `dist/` bundles.
-- **Verification Discipline**: Detail the spec/test-first approach, identify which suites (`test:all`, `coverage`, integration) must change, and justify every mock by marking it as an integration scenario.
-- **Documentation & Observability**: List the README, docs site, diagrams, or logging touchpoints that need updates so runtime guidance stays accurate.
-- **Automation & Trusted Tooling**: Use the provided scripts (`do-install`, `prepare-pr`, `drawings`, `uml`, etc.); flag and mitigate any workflow that cannot rely on them.
-
-Any violation must be captured in the Complexity Tracking table with the justification and maintainer approval.
+[Gates determined based on constitution file]
 
 ## Project Structure
 
