@@ -15,7 +15,6 @@
   "scripts": {
     "start": "node lib/bin/cli.cjs",
     "start-dev": "ts-node src/bin/cli.ts",
-    "dev": "tsx watch fastmcp-server.ts",
     "do-install": "NPM_TOKEN=$(cat .npmtoken) npm install",
     "update-dependencies": "PREFIX=\"decaf-ts\"; npm ls | grep \"$PREFIX\" | awk -F/ '{print $NF}' | sed 's/@.*//' | xargs -I package npm update @\"$PREFIX\"/package",
     "update-scripts": "node ./bin/update-scripts.cjs",
@@ -131,17 +130,13 @@
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.31.0"
   },
-  "peerDependencies": {
-    "@decaf-ts/as-zod": "latest",
+  "peerDependencies": {},"license": "AGPL-3.0-only",
+  "dependencies": {
+    "ts-morph": "^21.0.0",
+    "fastmcp": "latest",
     "@decaf-ts/cli": "latest",
     "@decaf-ts/decoration": "latest",
     "@decaf-ts/logging": "latest",
-    "diff": "^7.0.0",
-    "ts-morph": "^21.0.0",
-    "typescript": "^5.6.3"
-  },
-  "license": "AGPL-3.0-only",
-  "dependencies": {
-    "fastmcp": "^3.21.0"
+    "zod": "latest"
   }
 }
