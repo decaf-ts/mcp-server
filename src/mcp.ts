@@ -188,7 +188,7 @@ export class McpServer {
           } as any;
         }
       );
-    } catch (e) {
+    } catch {
       // ignore
     }
   }

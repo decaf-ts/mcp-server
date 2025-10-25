@@ -21,3 +21,7 @@
 /node_modules
 !.gitkeep
 /.codex/auth.json
+
+# Patterns for local tools package
+/tools/ast-jsdoc-tools/node_modules/
+/tools/ast-jsdoc-tools/dist/

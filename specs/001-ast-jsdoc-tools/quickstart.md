@@ -13,6 +13,13 @@ npm install
 ```bash
 # from repo root
 node ./tools/ast-jsdoc-tools/bin/cli.js file --path src/index.ts --dry-run --output reports/file-report.json
+
+Alternatively, use the in-repo CLI for interactive review of suggestions for a single file:
+
+```bash
+# interactive review (prompts for each suggestion)
+node ./src/tools/ast-jsdoc-tools/cli/cli.js interactive src/path/to/file.ts
+```
 ```
 
 3. Run repository dry-run (uses heuristics for context):

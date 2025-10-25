@@ -50,7 +50,7 @@ export async function analyzeFile(filePath: string): Promise<AstFileReport> {
         } else {
           signature = decl.getText().slice(0, 200).replace(/\s+/g, ' ').trim();
         }
-      } catch (err) {
+      } catch {
         signature = undefined;
       }
 

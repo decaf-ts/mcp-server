@@ -32,11 +32,11 @@ export class McpWrapper {
               results.push(full);
             }
           }
-        } catch (err) {
+        } catch {
           // ignore per-file errors
         }
       }
-    } catch (err) {
+    } catch {
       // ignore directory errors
     }
     return results;
@@ -52,22 +52,22 @@ export class McpWrapper {
       // If module exports an `enrich` function, attempt to require it safely
       try {
         // try require
-
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
         const mod = require(filePath);
         if (mod && typeof mod.enrich === "function") {
           try {
             const res = mod.enrich(server);
             if (res && typeof res.then === "function") await res;
-          } catch (e) {
+          } catch {
             // ignore errors from module enrich to keep tests stable
           }
         }
-      } catch (e) {
+      } catch {
         // ignore require errors (ESM, etc.)
       }
       return { mcp: server, package: pkgName, version: "0.0.0" };
-    } catch (e) {
-      throw new Error(String(e));
+    } catch (err) {
+      throw new Error(String(err));
     }
   }
 
@@ -77,7 +77,7 @@ export class McpWrapper {
     for (const f of files) {
       try {
         await this.load(undefined, f);
-      } catch (e) {
+      } catch {
         // ignore
       }
     }
@@ -89,7 +89,7 @@ export class McpWrapper {
     return undefined;
   }
 
-  async run(args: string[] = process.argv) {
+  async run() {
     // Simulate the CLI run: boot and return. Do not start network or stdio servers here to avoid blocking tests
     await this.boot();
     // no-op for args parsing; return successfully

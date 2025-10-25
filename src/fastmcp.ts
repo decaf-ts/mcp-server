@@ -51,7 +51,7 @@ export class FastMCP {
     this.resourceTemplates.push(t);
   }
 
-  async start(opts?: any) {
+  async start() {
     // no-op for tests
     return Promise.resolve();
   }

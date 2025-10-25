@@ -90,6 +90,11 @@
 - [ ] T033 Add conflict resolution prompts to interactive mode in /home/tvenceslau/local-workspace/decaf-ts/mcp-server/tools/ast-jsdoc-tools/src/cli/interactive.ts
 - [ ] T034 [P] Add unit tests for heuristic rules in /home/tvenceslau/local-workspace/decaf-ts/mcp-server/tools/ast-jsdoc-tools/test/unit/heuristics.test.ts
 - [ ] T035 [P] Add unit tests for JSDoc templates in /home/tvenceslau/local-workspace/decaf-ts/mcp-server/tools/ast-jsdoc-tools/test/unit/templates.test.ts
+ 
+Completed:
+- [x] T020 [US2] Add interactive mode to file processor (interactive CLI implemented at `src/tools/ast-jsdoc-tools/cli/interactive.ts`)
+- [x] T021 [US2] Implement suggestion review interface (CLI wiring added in `src/tools/ast-jsdoc-tools/cli/cli.ts`)
+- [x] T033 Add conflict resolution prompts to interactive mode (basic prompt flow implemented)
 
 ## Dependencies
 

@@ -100,20 +100,20 @@ export class ModuleRegistry {
             const arrText = content.slice(start, end + 1);
             try {
               return JSON.parse(arrText);
-            } catch (e) {
+            } catch {
               const normalized = arrText
                 .replace(/'(?:\\'|[^'])*'/g, (m) => m.replace(/'/g, '"'))
-                .replace(/([\{,]\s*)([A-Za-z_$][\w$]*)(\s*:)/g, '$1"$2"$3')
+                .replace(/([{,]\s*)([A-Za-z_$][\w$]*)(\s*:)/g, '$1"$2"$3')
                 .replace(/,\s*([\]}])/g, "$1");
               try {
                 return JSON.parse(normalized);
-              } catch (e2) {
+              } catch {
                 return undefined;
               }
             }
           }
         }
-      } catch (e) {
+      } catch {
         return undefined;
       }
       return undefined;
