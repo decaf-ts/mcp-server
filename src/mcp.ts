@@ -249,3 +249,10 @@ export function createServer(opts?: { name?: string; version?: string }) {
 }
 
 export { default } from "./fastmcp/index";
+export {
+  tools,
+  setWorkspaceRoot,
+  getWorkspaceRoot,
+  buildResourceTemplates,
+  buildDocPrompts,
+} from "./fastmcp/index";
