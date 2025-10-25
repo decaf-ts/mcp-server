@@ -76,9 +76,17 @@ async function loadArrayFromIndex(
         try {
           return JSON.parse(arrText);
         } catch (e) {
-          const normalized = arrText.replace(/'(?:\\'|[^'])*'/g, (m) =>
-            m.replace(/'/g, '"')
-          );
+          // Normalize TS object literals to JSON:
+          // - convert single quotes to double quotes
+          // - quote unquoted object keys
+          // - strip trailing commas
+          let normalized = arrText
+            // unify quotes in string literals
+            .replace(/'(?:\\'|[^'])*'/g, (m) => m.replace(/'/g, '"'))
+            // quote unquoted keys after { or ,
+            .replace(/([\{,]\s*)([A-Za-z_$][\w$]*)(\s*:)/g, '$1"$2"$3')
+            // remove trailing commas before ] or }
+            .replace(/,(\s*[\}\]])/g, '$1');
           try {
             return JSON.parse(normalized);
           } catch (e2) {
