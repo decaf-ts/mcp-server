@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import os from "os";
 import { PromptExport } from "../types";
-import { createTwoFilesPatch, applyPatch } from "diff";
+import { applyPatch } from "diff";
 
 let WORKSPACE_ROOT = process.cwd();
 export function setWorkspaceRoot(p: string) {
