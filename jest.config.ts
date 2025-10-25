@@ -8,11 +8,12 @@ const config: Config.InitialOptions = {
   testRegex: "/tests/.*\\.(test|spec)\\.(ts|tsx)$",
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
   extensionsToTreatAsEsm: [".ts", ".tsx"],
-  transformIgnorePatterns: ["node_modules/(?!(fastmcp|mcp-proxy|@modelcontextprotocol)/)"],
+  transformIgnorePatterns: [
+    "node_modules/(?!(fastmcp|mcp-proxy|@modelcontextprotocol)/)",
+  ],
   moduleNameMapper: {
     "^(\\.{1,2}/.*)\\.js$": "$1",
   },
-  setupFiles: ["<rootDir>/tests/setup.ts"],
   globals: {
     "ts-jest": {
       useESM: true,
