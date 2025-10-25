@@ -5,16 +5,6 @@
 **Status**: Draft  
 **Input**: User description: "$ARGUMENTS"
 
-## Constitution Compliance *(mandatory)*
-
-This feature MUST declare compliance with the project Constitution (`.specify/memory/constitution.md`). Specify one line:
-
-- `COMPLIES: Yes`  
-  or
-- `COMPLIES: No (explain deviations and provide remediation tasks)`
-
-If `COMPLIES: No` then list required follow-up tasks and a plan to reach compliance. Tests (Jest) and required quality gates MUST be referenced here.
-
 ## User Scenarios & Testing *(mandatory)*
 
 <!--
