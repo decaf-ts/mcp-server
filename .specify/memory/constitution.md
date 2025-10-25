@@ -1,20 +1,21 @@
 <!--
 Sync Impact Report
 
-- Version change: none (template) → 1.0.0
+- Version change: 1.0.0 → 1.0.1 (PATCH)
 - Modified / Added Principles:
-	- Core: Code Organization, File & Export Conventions, Test-First Quality,
-		Design Patterns & Simplicity, Review/CI & Observability
-- Added sections: Constraints & Tooling; Development Workflow & Quality Gates
-- Removed sections: none (template placeholders replaced)
-- Templates requiring updates:
-	- .specify/templates/plan-template.md ✅ updated
-	- .specify/templates/tasks-template.md ⚠ pending (no change required but recommend review)
-	- .specify/templates/spec-template.md ⚠ pending (aligns with principles; no mandatory edits)
+	- Core principles unchanged; clarifications and operational guidance added for tooling and CLI workflows.
+- Added sections: none (existing sections clarified)
+- Removed sections: none
+- Templates / Files updated by this amendment:
+	- specs/001-ast-jsdoc-tools/quickstart.md ✅ updated (interactive CLI example added)
+	- specs/001-ast-jsdoc-tools/tasks.md ✅ updated (interactive tasks marked completed)
+	- .specify/templates/plan-template.md ✅ reviewed (no breaking changes required)
+	- .specify/templates/tasks-template.md ⚠ pending review (no mandatory edits made)
+	- .specify/templates/spec-template.md ⚠ pending review (aligns with principles)
 - Follow-up TODOs:
-	- TODO(RATIFICATION_DATE): confirm original ratification date or accept today's date
-	- Review `workdocs/tutorials/For Developers.md` to ensure npm script guidance remains accurate
-	- Optionally add a `docs/context.json` schema if repos adopt explicit mapping overrides for TOOL4
+	- RATIFICATION_DATE resolved: 2025-10-25 (entered during Sync Impact amendment)
+	- Run a quick manual verification using `npm run server:dev` and `npm run server` to ensure MCP exports expected tools/prompts/resources after the interactive CLI is exercised.
+	- Optionally add `docs/context.json` schema if repositories adopt explicit mapping overrides for TOOL4 (recommended for large repos).
 -->
 
 # Decaf MCP Server Constitution
@@ -98,4 +99,4 @@ reviews and ensures architectural coherence.
 	uses version `1.0.0`. Patch bumps are for wording clarifications; minor bumps for added
 	principles; major bumps for redefinitions or removals.
 
-**Version**: 1.0.0 | **Ratified**: TODO(RATIFICATION_DATE): confirm original adoption date | **Last Amended**: 2025-10-25
+**Version**: 1.0.1 | **Ratified**: 2025-10-25 | **Last Amended**: 2025-10-25

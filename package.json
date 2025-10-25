@@ -15,7 +15,7 @@
   "scripts": {
     "server": "node lib/bin/cli.cjs",
     "server:dev": "tsx src/bin/cli.ts",
-    "server:inspect": "set DANGEROUSLY_OMIT_AUTH=true && @modelcontextprotocol/inspector npm run server:dev",
+    "server:inspect": "set DANGEROUSLY_OMIT_AUTH=true && npx @modelcontextprotocol/inspector npm run server:dev",
     "do-install": "NPM_TOKEN=$(cat .npmtoken) npm install",
     "update-dependencies": "PREFIX=\"decaf-ts\"; npm ls | grep \"$PREFIX\" | awk -F/ '{print $NF}' | sed 's/@.*//' | xargs -I package npm update @\"$PREFIX\"/package",
     "update-scripts": "node ./bin/update-scripts.cjs",
