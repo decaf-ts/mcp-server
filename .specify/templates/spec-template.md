@@ -7,8 +7,6 @@
 
 ## User Scenarios & Testing *(mandatory)*
 
-Per the Verification Discipline principle, every story below must be independently implementable and testable without shared mocks; map scenarios directly to `tests/unit`, `tests/integration`, or `tests/bundling` so coverage can be enforced via `npm run coverage`.
-
 <!--
   IMPORTANT: User stories should be PRIORITIZED as user journeys ordered by importance.
   Each user story/journey must be INDEPENDENTLY TESTABLE - meaning if you implement just ONE of them,
@@ -78,8 +76,6 @@ Per the Verification Discipline principle, every story below must be independent
 - How does system handle [error scenario]?
 
 ## Requirements *(mandatory)*
-
-Trace each requirement back to the Operational Guardrails: specify Node/npm expectations, packaging impacts on `lib/` and `dist/`, documentation updates, and any repository script (`build`, `test:dist`, `prepare-pr`, etc.) the work relies on.
 
 <!--
   ACTION REQUIRED: The content in this section represents placeholders.

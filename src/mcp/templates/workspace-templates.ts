@@ -22,8 +22,13 @@ export function buildWorkspaceResourceTemplates(): WorkspaceResourceTemplate[] {
       mimeType: "text/plain",
       arguments: sharedArguments,
       load: async (args: { path: string }) => {
-        const text = await readWorkspaceFile(root, args.path);
-        return { text };
+        try {
+          const text = await readWorkspaceFile(root, args.path);
+          return { text: String(text) };
+        } catch (err) {
+          // propagate as-is for tests to assert errors
+          throw err;
+        }
       },
     },
     {
@@ -33,8 +38,12 @@ export function buildWorkspaceResourceTemplates(): WorkspaceResourceTemplate[] {
       mimeType: "text/plain",
       arguments: sharedArguments,
       load: async (args: { path: string }) => {
-        const text = await readWorkspaceFile(root, args.path);
-        return { text };
+        try {
+          const text = await readWorkspaceFile(root, args.path);
+          return { text: String(text) };
+        } catch (err) {
+          throw err;
+        }
       },
     },
     {
@@ -45,8 +54,12 @@ export function buildWorkspaceResourceTemplates(): WorkspaceResourceTemplate[] {
       mimeType: "text/plain",
       arguments: sharedArguments,
       load: async (args: { path: string }) => {
-        const text = await readWorkspaceFile(root, args.path);
-        return { text };
+        try {
+          const text = await readWorkspaceFile(root, args.path);
+          return { text: String(text) };
+        } catch (err) {
+          throw err;
+        }
       },
     },
   ];
@@ -58,3 +71,4 @@ export function buildWorkspaceResourceTemplates(): WorkspaceResourceTemplate[] {
   );
   return workspaceResourceTemplates;
 }
+

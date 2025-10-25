@@ -92,3 +92,5 @@ export class McpUtils {
     return name[name.length - 1];
   }
 }
+
+export * from "./utils/modulePaths";

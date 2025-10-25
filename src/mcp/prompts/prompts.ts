@@ -8,6 +8,8 @@ import {
 } from "../../constants";
 import type { DocPrompt } from "../types";
 import { getWorkspaceRoot } from "../workspace";
+import type { PromptAsset } from "../../types";
+import { moduleRegistry } from "../moduleRegistry";
 
 export const prompts: InputPrompt<undefined>[] = [];
 
@@ -27,7 +29,10 @@ const OBJECT_PROMPT_DEPENDENCIES: Record<string, readonly string[]> = {
   "mcp-module": ["mcp-module"],
 };
 
-export function getObjectPromptDependencies(): Record<string, readonly string[]> {
+export function getObjectPromptDependencies(): Record<
+  string,
+  readonly string[]
+> {
   return OBJECT_PROMPT_DEPENDENCIES;
 }
 
@@ -94,11 +99,9 @@ export function buildObjectPrompts(): InputPrompt<undefined>[] {
         const sections = existing.map((prompt) =>
           summarizePromptContent(prompt, toTitleCase(prompt.name))
         );
-        return [
-          `# Codex guidance for ${objectType}`,
-          "",
-          ...sections,
-        ].join("\n");
+        return [`# Codex guidance for ${objectType}`, "", ...sections].join(
+          "\n"
+        );
       },
     });
   }
@@ -106,16 +109,31 @@ export function buildObjectPrompts(): InputPrompt<undefined>[] {
   return outputs.sort((a, b) => a.name.localeCompare(b.name));
 }
 
+function toInputPrompt(asset: PromptAsset): InputPrompt<undefined> {
+  const provenance = asset.provenance ? ` (module: ${asset.provenance})` : "";
+  return {
+    name: asset.id,
+    description: `${asset.description ?? asset.title}${provenance}`,
+    load: async () => asset.load(),
+  };
+}
+
+function buildModulePrompts(): InputPrompt<undefined>[] {
+  return moduleRegistry.listPrompts().map(toInputPrompt);
+}
+
 export function refreshPrompts(repoPath?: string): InputPrompt<undefined>[] {
   const docPrompts = buildDocPrompts();
   const objectPrompts = buildObjectPrompts();
   const repoPrompts = repoPath ? buildPrompts(repoPath) : [];
+  const modulePrompts = buildModulePrompts();
   prompts.splice(
     0,
     prompts.length,
     ...docPrompts,
     ...objectPrompts,
-    ...repoPrompts
+    ...repoPrompts,
+    ...modulePrompts
   );
   return prompts;
 }
@@ -125,6 +143,9 @@ export function discoverDocPrompts(root: string): DocPrompt[] {
 
   for (const directory of PROMPT_DIRECTORIES) {
     const promptDir = path.join(root, directory);
+    // debug logging to help tests diagnose prompt discovery
+
+    console.debug("[discoverDocPrompts] checking", promptDir);
     if (!fs.existsSync(promptDir) || !fs.statSync(promptDir).isDirectory()) {
       continue;
     }

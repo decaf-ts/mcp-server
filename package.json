@@ -1,7 +1,7 @@
 {
   "name": "@decaf-ts/mcp-server",
   "version": "0.0.4",
-  "description": "cmp server for code assistance of decaf-ts projects",
+  "description": "mcp server for code assistance of decaf-ts projects",
   "type": "module",
   "bin": {
     "decaf-mcp": "./lib/bin/cli.cjs"
@@ -16,6 +16,7 @@
     "start": "node lib/bin/cli.cjs",
     "dev": "tsx watch fastmcp-server.ts",
     "do-install": "NPM_TOKEN=$(cat .npmtoken) npm install",
+    "update-dependencies": "PREFIX=\"decaf-ts\"; npm ls | grep \"$PREFIX\" | awk -F/ '{print $NF}' | sed 's/@.*//' | xargs -I package npm update @\"$PREFIX\"/package",
     "update-scripts": "node ./bin/update-scripts.cjs",
     "on-first-run": "node ./bin/update-scripts.cjs --boot",
     "set-git-auth": "git config url.\"https://api:$(cat .token)@github.com/\".insteadOf \"https://github.com/\" && git config url.\"https://ssh:$(cat .token)@github.com/\".insteadOf \"ssh://git@github.com/\" && git config url.\"https://git:$(cat .token)@github.com/\".insteadOf \"git@github.com:\"",
@@ -30,8 +31,10 @@
     "test:all": "jest --testPathPattern=\"/tests\" --passWithNoTests --detectOpenHandles",
     "test:circular": "dpdm -T --no-warning --no-tree ./src/index.ts",
     "coverage": "rimraf ./workdocs/reports/data/*.json && npm run test:all -- --coverage --config=./workdocs/reports/jest.coverage.config.ts",
-    "lint": "eslint .",
-    "lint-fix": "eslint --fix .",
+    "validate:modules": "node ./src/bin/validate-modules.cjs",
+    "validate-modules": "npm run validate:modules",
+    "lint": "npm run validate:modules && eslint .",
+    "lint-fix": "npm run validate:modules && eslint --fix .",
     "prepare-pr": "npm run lint-fix && npm run build:prod && npm run coverage && npm run docs",
     "prepare-release": "npm run lint-fix && npm run build:prod && npm run coverage && npm run docs",
     "release": "./bin/tag-release.sh",
@@ -39,6 +42,8 @@
     "drawings": "for FILE in workdocs/drawings/*.drawio; do echo \"converting $FILE to image...\" && docker run --rm -v $(pwd):/data rlespinasse/drawio-export --format png $FILE; done && cp -rf workdocs/drawings/export/* workdocs/resources/",
     "uml": "cd workdocs/uml && for FILE in ./*.puml; do docker run --rm -v $(pwd):/work -w /work miy4/plantuml -DPLANTUML_LIMIT_SIZE=8192 -tpng $FILE; done && cd ../.. && cp -fr workdocs/uml/*.png workdocs/resources/",
     "docs": "npx rimraf ./docs && mkdir docs && node ./bin/build-scripts.cjs --docs",
+    "scaffold-module": "node ./src/bin/scaffold-module.cjs",
+    "check-aggregation": "node ./src/bin/check-aggregate.cjs",
     "publish-docs": "docker run -it --rm --user $(id -u):$(id -g) -v \"$(pwd)/workdocs/confluence:/content\" -e ATLASSIAN_API_TOKEN=$(cat .confluence-token) ghcr.io/markdown-confluence/publish:latest",
     "docker:login": "docker login ghcr.io -u $(cat .dockeruser) -p $(cat .dockertoken)",
     "docker:build": "npm run docker:build-base",
@@ -55,7 +60,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/decaf-ts/ts-workspace.git"
+    "url": "git+https://github.com/decaf-ts/mc-server.git"
   },
   "engines": {
     "node": ">=20.0.0",
@@ -88,9 +93,9 @@
   ],
   "author": "Tiago Venceslau and Contributors",
   "bugs": {
-    "url": "https://github.com/decaf-ts/ts-workspace/issues"
+    "url": "https://github.com/decaf-ts/mcp-server/issues"
   },
-  "homepage": "https://github.com/decaf-ts/ts-workspace#readme",
+  "homepage": "https://github.com/decaf-ts/mcp-server#readme",
   "devDependencies": {
     "@decaf-ts/utils": "latest",
     "@eslint/js": "^9.25.1",
@@ -132,10 +137,9 @@
     "@decaf-ts/logging": "latest",
     "diff": "^7.0.0",
     "ts-morph": "^21.0.0",
-    "typescript": "^5.6.3",
-    "zod": "^3.25.76"
+    "typescript": "^5.6.3"
   },
-  "license": "MIT OR AGPL-3.0-only",
+  "license": "AGPL-3.0-only",
   "dependencies": {
     "fastmcp": "^3.20.0"
   }
