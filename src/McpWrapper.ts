@@ -1,27 +1,20 @@
-import fs from "fs";
-import path from "path";
+import * as fs from "fs";
+import * as path from "path";
 import { MCP_FILE_NAME } from "./constants";
 import { McpUtils } from "./utils";
 import { FastMCP } from "fastmcp";
 import { LoggedClass } from "@decaf-ts/logging";
 import { VERSION } from "./metadata";
+import { fileURLToPath } from "url";
+
+// allow referencing __filename/__dirname in both CommonJS and ESM runtimes
+declare const __filename: string | undefined;
+declare const __dirname: string | undefined;
 
 /**
  * @description Utility class to handle CLI functionality from all Decaf modules
  * @summary This class provides a wrapper around Commander.js to handle CLI commands from different Decaf modules.
  * It crawls the filesystem to find CLI modules, loads them, and registers their commands.
- *
- * @param {string} [basePath] The base path to look for modules in. Defaults to `./`
- * @param {number} [crawlLevels] Number of folder levels to crawl to find modules from the basePath. Defaults to 4
- *
- * @example
- * // Create a new CLI wrapper and run it with custom options
- * const cli = new CliWrapper('./src', 2);
- * cli.run(process.argv).then(() => {
- *   console.log('CLI commands executed successfully');
- * });
- *
- * @class McpWrapper
  */
 export class McpWrapper extends LoggedClass {
   private _mcp?: FastMCP;
@@ -33,7 +26,31 @@ export class McpWrapper extends LoggedClass {
     private crawlLevels = 4
   ) {
     super();
-    this.rootPath = path.resolve(__dirname, "..");
+    // Support both CommonJS and ESM runtimes for filename/dirname
+    let localDirname: string;
+    if (typeof __filename !== "undefined" && typeof __dirname !== "undefined") {
+      // CommonJS environment
+      localDirname = __dirname as string;
+    } else {
+      // ESM or other env: compute import.meta.url at runtime to avoid TS compile-time import.meta checks
+      let metaUrl: string | undefined;
+      try {
+        // Use a dynamic function so TypeScript won't parse `import.meta` at compile time
+        const fn = new Function(
+          'return (typeof import !== "undefined" && typeof import.meta !== "undefined") ? import.meta.url : undefined;'
+        );
+        metaUrl = fn();
+      } catch {
+        metaUrl = undefined;
+      }
+      if (metaUrl) {
+        localDirname = path.dirname(fileURLToPath(metaUrl));
+      } else {
+        // Last-resort fallback: use current working directory
+        localDirname = process.cwd();
+      }
+    }
+    this.rootPath = path.resolve(localDirname, "..");
   }
 
   /**
@@ -191,8 +208,8 @@ export class McpWrapper extends LoggedClass {
    *   Command-->>CliWrapper: result
    *   CliWrapper-->>Client: result
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async run(args: string[] = process.argv) {
+    void args;
     const server = await this.boot();
     await server.start({ transportType: "stdio" });
   }

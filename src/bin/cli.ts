@@ -22,7 +22,6 @@
  *
  * @memberOf module:MCP
  */
-
 import { McpWrapper } from "../McpWrapper";
 new McpWrapper()
   .run(process.argv)
